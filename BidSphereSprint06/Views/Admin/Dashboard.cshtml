@@ -1,0 +1,808 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BidSphere - Admin Dashboard</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --info: #4895ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --sidebar-width: 250px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            background-color: #f5f7fb;
+            color: var(--dark);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            color: white;
+            position: fixed;
+            transition: all 0.3s;
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+            .sidebar-header h2 {
+                font-size: 1.5rem;
+                margin-bottom: 5px;
+            }
+
+        .sidebar-menu {
+            padding: 15px 0;
+        }
+
+            .sidebar-menu ul {
+                list-style: none;
+            }
+
+            .sidebar-menu li {
+                padding: 12px 20px;
+                transition: all 0.3s;
+            }
+
+                .sidebar-menu li:hover {
+                    background-color: rgba(255, 255, 255, 0.1);
+                    cursor: pointer;
+                }
+
+                .sidebar-menu li.active {
+                    background-color: rgba(255, 255, 255, 0.2);
+                    border-left: 4px solid white;
+                }
+
+            .sidebar-menu i {
+                margin-right: 10px;
+                width: 20px;
+                text-align: center;
+            }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+            .header h1 {
+                color: var(--primary);
+            }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+            .user-info img {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                margin-right: 10px;
+            }
+
+        /* Dashboard Stats */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s;
+        }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+            }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 24px;
+            color: white;
+        }
+
+        .stat-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .stat-info p {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        /* Form Styles */
+        .form-container {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: 500;
+            }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+
+            .form-control:focus {
+                border-color: var(--primary);
+                outline: none;
+            }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+            .btn-primary:hover {
+                background-color: var(--secondary);
+            }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+            .btn-danger:hover {
+                background-color: #d11466;
+            }
+
+        /* Table Styles */
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background-color: #e7f7ef;
+            color: #1ea97c;
+        }
+
+        .badge-danger {
+            background-color: #fde8e8;
+            color: #f05252;
+        }
+
+        .badge-warning {
+            background-color: #fef5e7;
+            color: #f59e0b;
+        }
+
+        .timer {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: var(--danger);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Section Management */
+        .section {
+            display: none;
+        }
+
+            .section.active {
+                display: block;
+            }
+
+        /* Filter Styles */
+        .filter-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .category-filter {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 8px 15px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+            .filter-btn.active {
+                background-color: var(--primary);
+                color: white;
+                border-color: var(--primary);
+            }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .sidebar
+
+        {
+            width: 70px;
+            overflow: hidden;
+        }
+
+        .sidebar-header h2, .sidebar-menu span {
+            display: none;
+        }
+
+        .sidebar-menu li {
+            text-align: center;
+            padding: 15px 0;
+        }
+
+        .sidebar-menu i {
+            margin-right: 0;
+            font-size: 1.2rem;
+        }
+
+        .main-content {
+            margin-left: 70px;
+        }
+
+        .stats-container {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-container {
+            flex-direction: column;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>BidSphere Admin</h2>
+            <p>Administration Panel</p>
+        </div>
+        <div class="sidebar-menu">
+            <ul>
+                <li class="active" data-section="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </li>
+                <li data-section="create-auction">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Create Auction</span>
+                </li>
+                <li data-section="view-auctions">
+                    <i class="fas fa-gavel"></i>
+                    <span>View Live Auctions</span>
+                </li>
+                <li data-section="bid-history">
+                    <i class="fas fa-history"></i>
+                    <span>Bid History</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1 id="section-title">Dashboard</h1>
+            <div class="user-info">
+                <img src="https://ui-avatars.com/api/?name=Admin+User&background=4361ee&color=fff" alt="Admin User">
+                <span>Admin</span>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="section active">
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background-color: var(--primary);">
+                        <i class="fas fa-gavel"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="live-auctions-count">12</h3>
+                        <p>Live Auctions</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background-color: var(--success);">
+                        <i class="fas fa-list"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="total-bidded-auctions">9</h3>
+                        <p>Total Bidded Active Auctions</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background-color: var(--warning);">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="total-registered-users">28</h3>
+                        <p>Registered Users</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background-color: var(--info);">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="revenue-generated">$1,250</h3>
+                        <p>Revenue Generated</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Done till yet -->
+            <div class="table-container">
+                <h2 style="padding: 20px 20px 0;">Recent Bid Activities</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Auction</th>
+                            <th>Bidder</th>
+                            <th>Action</th>
+                            <th>Bid Amount</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>MacBook Pro 2023</td>
+                            <td>john_doe</td>
+                            <td><span class="badge badge-success">Bid Placed</span></td>
+                            <td>$1,450</td>
+                            <td>2 minutes ago</td>
+                        </tr>
+                        <tr>
+                            <td>Rolex Submariner</td>
+                            <td>alex_wong</td>
+                            <td><span class="badge badge-success">Bid Placed</span></td>
+                            <td>$7,200</td>
+                            <td>5 minutes ago</td>
+                        </tr>
+                        <tr>
+                            <td>iPhone 14 Pro</td>
+                            <td>mike_jones</td>
+                            <td><span class="badge badge-success">Bid Placed</span></td>
+                            <td>$950</td>
+                            <td>15 minutes ago</td>
+                        </tr>
+                        <tr>
+                            <td>Designer Dress</td>
+                            <td>emma_roberts</td>
+                            <td><span class="badge badge-success">Bid Placed</span></td>
+                            <td>$220</td>
+                            <td>25 minutes ago</td>
+                        </tr>
+                        <tr>
+                            <td>Refrigerator</td>
+                            <td>sarah_wilson</td>
+                            <td><span class="badge badge-success">Bid Placed</span></td>
+                            <td>$550</td>
+                            <td>30 minutes ago</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Create Auction Section -->
+        <div id="create-auction" class="section">
+            <div class="form-container">
+                <h2>Create New Auction</h2>
+                <form id="auction-form">
+                    <div class="form-group">
+                        <label for="auction-name">Product Name</label>
+                        <input type="text" id="auction-name" class="form-control" placeholder="Enter product name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="auction-category">Category</label>
+                        <select id="auction-category" class="form-control" required>
+                            <option value="">Select Category</option>
+                            <option value="Fashion Outfit">Fashion Outfit</option>
+                            <option value="Home Appliances">Home Appliances</option>
+                            <option value="Laptops">Laptops</option>
+                            <option value="Perfumes">Perfumes</option>
+                            <option value="Luxury Watches">Luxury Watches</option>
+                            <option value="Automobile">Automobile</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="starting-price">Starting Price ($)</label>
+                        <input type="number" id="starting-price" class="form-control" placeholder="Enter starting price" min="0" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="auction-description">Description</label>
+                        <textarea id="auction-description" class="form-control" rows="4" placeholder="Enter auction description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="duration-value">Duration</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="number" id="duration-value" class="form-control" placeholder="Duration value" min="1" required>
+                            <select id="duration-unit" class="form-control" required>
+                                <option value="minutes">Minutes</option>
+                                <option value="hours">Hours</option>
+                                <option value="days">Days</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Auction</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- View Live Auctions Section -->
+        <div id="view-auctions" class="section">
+            <div class="filter-container">
+                <h2>Live Auctions</h2>
+                <div class="category-filter">
+                    <button class="filter-btn active" data-category="all">All</button>
+                    <button class="filter-btn" data-category="Fashion Outfit">Fashion</button>
+                    <button class="filter-btn" data-category="Home Appliances">Appliances</button>
+                    <button class="filter-btn" data-category="Laptops">Laptops</button>
+                    <button class="filter-btn" data-category="Perfumes">Perfumes</button>
+                    <button class="filter-btn" data-category="Luxury Watches">Watches</button>
+                    <button class="filter-btn" data-category="Automobile">Automobile</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="live-auctions-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Starting Price</th>
+                            <th>Current Price</th>
+                            <th>Expires In</th>
+                            <th>Bid Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Bid History Section -->
+        <div id="bid-history" class="section">
+            <h2>Bid History (Closed Auctions)</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Auction Name</th>
+                            <th>Category</th>
+                            <th>Final Price</th>
+                            <th>Winner ID</th>
+                            <th>Closed At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>iPhone 14 Pro</td>
+                            <td>Laptops</td>
+                            <td>$1,150</td>
+                            <td>user_45</td>
+                            <td>2023-10-15 14:30:00</td>
+                        </tr>
+                        <tr>
+                            <td>Rolex Submariner</td>
+                            <td>Luxury Watches</td>
+                            <td>$8,500</td>
+                            <td>user_12</td>
+                            <td>2023-10-14 09:15:00</td>
+                        </tr>
+                        <tr>
+                            <td>Designer Handbag</td>
+                            <td>Fashion Outfit</td>
+                            <td>$320</td>
+                            <td>user_78</td>
+                            <td>2023-10-13 16:45:00</td>
+                        </tr>
+                        <tr>
+                            <td>Refrigerator</td>
+                            <td>Home Appliances</td>
+                            <td>$650</td>
+                            <td>user_33</td>
+                            <td>2023-10-12 11:20:00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data for live auctions
+        const liveAuctions = [
+            {
+                id: 1,
+                name: "MacBook Pro 2023",
+                category: "Laptops",
+                startingPrice: 1200,
+                currentPrice: 1450,
+                endTime: new Date(Date.now() + 2 * 60 * 1000), // 2 minutes from now
+                status: "active"
+            },
+            {
+                id: 2,
+                name: "Rolex Submariner",
+                category: "Luxury Watches",
+                startingPrice: 5000,
+                currentPrice: 7200,
+                endTime: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes from now
+                status: "active"
+            },
+            {
+                id: 3,
+                name: "Designer Dress",
+                category: "Fashion Outfit",
+                startingPrice: 150,
+                currentPrice: 220,
+                endTime: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes from now
+                status: "active"
+            },
+            {
+                id: 4,
+                name: "Refrigerator",
+                category: "Home Appliances",
+                startingPrice: 400,
+                currentPrice: 550,
+                endTime: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes from now
+                status: "active"
+            }
+        ];
+
+        // Sidebar navigation
+        document.querySelectorAll('.sidebar-menu li').forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove active class from all items
+                document.querySelectorAll('.sidebar-menu li').forEach(li => {
+                    li.classList.remove('active');
+                });
+
+                // Add active class to clicked item
+                this.classList.add('active');
+
+                // Hide all sections
+                document.querySelectorAll('.section').forEach(section => {
+                    section.classList.remove('active');
+                });
+
+                // Show selected section
+                const sectionId = this.getAttribute('data-section');
+                document.getElementById(sectionId).classList.add('active');
+
+                // Update section title
+                document.getElementById('section-title').textContent =
+                    this.querySelector('span').textContent;
+            });
+        });
+
+        // Category filter for live auctions
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active class from all filter buttons
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    b.classList.remove('active');
+                });
+
+                // Add active class to clicked button
+                this.classList.add('active');
+
+                // Filter auctions
+                const category = this.getAttribute('data-category');
+                filterAuctions(category);
+            });
+        });
+
+        // Filter auctions by category
+        function filterAuctions(category) {
+            const tableBody = document.querySelector('#live-auctions-table tbody');
+            tableBody.innerHTML = '';
+
+            const filteredAuctions = category === 'all'
+                ? liveAuctions
+                : liveAuctions.filter(auction => auction.category === category);
+
+            filteredAuctions.forEach(auction => {
+                const row = document.createElement('tr');
+                const timeLeft = calculateTimeLeft(auction.endTime);
+
+                row.innerHTML = `
+                    <td>${auction.name}</td>
+                    <td>${auction.category}</td>
+                    <td>$${auction.startingPrice}</td>
+                    <td>$${auction.currentPrice}</td>
+                    <td class="timer" data-end="${auction.endTime.getTime()}">${timeLeft}</td>
+                    <td><span class="badge badge-success">Active</span></td>
+                    <td class="action-buttons">
+                        <button class="btn btn-primary" onclick="editAuction(${auction.id})">Update</button>
+                        <button class="btn btn-danger" onclick="deleteAuction(${auction.id})">Delete</button>
+                    </td>
+                `;
+
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Calculate time left for auction
+        function calculateTimeLeft(endTime) {
+            const now = new Date();
+            const timeDiff = endTime - now;
+
+            if (timeDiff <= 0) {
+                return "Expired";
+            }
+
+            const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+            return `${minutes}min ${seconds}sec`;
+        }
+
+        // Update timers every second
+        function updateTimers() {
+            document.querySelectorAll('.timer').forEach(timer => {
+                const endTime = parseInt(timer.getAttribute('data-end'));
+                const now = new Date().getTime();
+                const timeDiff = endTime - now;
+
+                if (timeDiff <= 0) {
+                    timer.textContent = "Expired";
+                    // In a real application, you would update the auction status here
+                } else {
+                    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+                    timer.textContent = `${minutes}min ${seconds}sec`;
+                }
+            });
+        }
+
+        // Initialize the dashboard
+        function initDashboard() {
+            // Populate live auctions table
+            filterAuctions('all');
+
+            // Start timer updates
+            setInterval(updateTimers, 1000);
+
+            // Handle auction form submission
+            document.getElementById('auction-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Auction created successfully!');
+                this.reset();
+            });
+        }
+
+        // Auction management functions
+        function editAuction(id) {
+            alert(`Editing auction with ID: ${id}`);
+            // In a real application, this would open a form with the auction details
+        }
+
+        function deleteAuction(id) {
+            if (confirm('Are you sure you want to delete this auction?')) {
+                alert(`Auction with ID: ${id} deleted`);
+                // In a real application, this would remove the auction from the database
+            }
+        }
+
+        // Initialize the dashboard when the page loads
+        window.onload = initDashboard;
+    </script>
+</body>
+</html>
