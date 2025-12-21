@@ -239,9 +239,6 @@
                                                 data-product-id="@auction.ProductId">
                                             <i class="fas fa-info-circle me-2"></i>Details
                                         </button>
-                                        <a href="@Url.Action("Category", "Product", new { id = auction.Item.Category })" class="btn btn-outline-info">
-                                            <i class="fas fa-filter me-2"></i>Similar
-                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -300,7 +297,7 @@
                 </div>
                 <div class="modal-body">
                     <p>Current Highest Bid: $<span id="currentBidAmount">0</span></p>
-                    <input type="number" id="bidAmount" class="form-control" placeholder="Enter your bid" min="0">
+                    <input type="number" id="bidAmount" class="form-control" step="1" onkeydown="return event.key !== '.'" placeholder="Enter your bid" min="0">
                     <div id="bidError" class="text-danger mt-2" style="display:none;"></div>
                 </div>
                 <div class="modal-footer">
@@ -366,7 +363,7 @@
 
             // When user clicks Submit Bid
             $('#submitBidBtn').click(function() {
-                const bidValue = parseFloat($('#bidAmount').val());
+                const bidValue = parseInt($('#bidAmount').val(),10);
 
                 if (bidValue <= currentPrice) {
                     $('#bidError').text('Your bid must be higher than current bid!').show();
@@ -375,14 +372,15 @@
 
                 // AJAX call to send bid to server
                 $.ajax({
-                    url: '/Auction/PlaceBid', // you will create this action
+                    url: '/Bid/PlaceBid', // you will create this action
                     type: 'POST',
                     data: {
                         auctionId: selectedAuctionId,
                         bidAmount: bidValue
                     },
                     success: function(response) {
-                        alert('Bid placed successfully!');
+                        //alert('Bid placed successfully!');
+                        alert(response);
                         $('#placeBidModal').modal('hide');
 
                         // Update current price on card

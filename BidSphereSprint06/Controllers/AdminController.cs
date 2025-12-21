@@ -25,7 +25,7 @@ namespace BidSphereProject.Controllers
         public IActionResult Dashboard()
         {
             Auction a1 = new Auction { Id = 1, ProductId = 2, StartingPrice = 300, CurrentPrice = 400, 
-            StartTime = DateTime.Now.AddDays(-2),EndTime=DateTime.Now.AddDays(1),BidCount=2,WinnerUserId=4,RunnerUpUserId=2,Status="Live"
+            StartTime = DateTime.Now.AddDays(-2),EndTime=DateTime.Now.AddDays(1),BidCount=2,WinnerUserId="4",RunnerUpUserId="2",Status="Live"
             };
 
             List<Product> auctions = new List<Product> // temporary data passed

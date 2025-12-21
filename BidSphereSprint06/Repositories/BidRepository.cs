@@ -44,15 +44,47 @@ namespace BidSphereProject.Repositories
                 return bids;
             }
         }
+
+         
         public async Task<IEnumerable<Bid>> GetBidsByUserId(string userId)
         {
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                string sql = @"Select * from Bid where UserId=@UserId";
-                IEnumerable<Bid> bids = await con.QueryAsync<Bid>(sql, new { UserId = userId });
-                return bids;
+                // Get bids
+                var bids = await con.QueryAsync<Bid>(
+                    "SELECT * FROM Bid WHERE UserId = @UserId ORDER BY BidTime DESC",
+                    new { UserId = userId }
+                );
+
+                var result = new List<Bid>();
+
+                foreach (var bid in bids)
+                {
+                    // Get auction for each bid
+                    var auction = await con.QuerySingleOrDefaultAsync<Auction>(
+                        "SELECT * FROM Auction WHERE Id = @Id",
+                        new { Id = bid.AuctionId }
+                    );
+
+                    if (auction != null)
+                    {
+                        // Get product for the auction
+                        var product = await con.QuerySingleOrDefaultAsync<Product>(
+                            "SELECT * FROM Product WHERE Id = @ProductId",
+                            new { ProductId = auction.ProductId }
+                        );
+
+                        auction.Item = product; // Attach product to auction
+                    }
+
+                    bid.AuctionInfo = auction; // Could be null
+                    result.Add(bid);
+                }
+
+                return result;
             }
         }
+
         public async Task<Bid> GetHighestBidForAuction(int auctionId)
         {
             using (SqlConnection con = new SqlConnection(_connectionString))

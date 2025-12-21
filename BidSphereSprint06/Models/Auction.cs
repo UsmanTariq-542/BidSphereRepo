@@ -15,8 +15,8 @@
 
         public int BidCount { get; set; }
 
-        public int? WinnerUserId { get; set; }
-        public int? RunnerUpUserId { get; set; }
+        public string? WinnerUserId { get; set; }
+        public string? RunnerUpUserId { get; set; }
 
         public string Status { get; set; }
         public List<Bid> Bids { get; set; } = new List<Bid>();

@@ -1,6 +1,10 @@
 ﻿using BidSphereProject.Interfaces;
+using BidSphereProject.Models;
+using BidSphereProject.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BidSphereProject.Controllers
 {
@@ -8,9 +12,11 @@ namespace BidSphereProject.Controllers
     {
         private readonly IBidRepository _bidRepo;
         private readonly IAuctionRepository _auctionRepo;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public BidController(IBidRepository bidRepo, IAuctionRepository auctionRepo)
+        public BidController(IBidRepository bidRepo, IAuctionRepository auctionRepo, UserManager<IdentityUser> userManager)
         {
+            _userManager = userManager;
             _bidRepo = bidRepo;
             _auctionRepo = auctionRepo;
         }
@@ -20,9 +26,23 @@ namespace BidSphereProject.Controllers
             return View();
         }
 
-        public IActionResult PlaceBid(int auctionId, decimal amount)
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> PlaceBid(int auctionId, decimal bidAmount)
         {
-            return View();
+            //return Ok("CONTROLLER_HIT");
+            var user = await _userManager.GetUserAsync(User);
+            string userId = user.Id; // string by default
+            var bid = new Bid
+            {
+                AuctionId = auctionId,
+                UserId = userId,
+                Amount = bidAmount,
+                BidTime = DateTime.UtcNow
+            };
+            int bidId = await _bidRepo.AddBid(bid);
+
+            return Ok($"Your bid is placed successfully with ID: {bidId}");
         }
 
         public IActionResult GetBidsByAuction(int auctionId)
