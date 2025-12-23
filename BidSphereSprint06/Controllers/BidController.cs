@@ -30,7 +30,6 @@ namespace BidSphereProject.Controllers
         [Authorize]
         public async Task<IActionResult> PlaceBid(int auctionId, decimal bidAmount)
         {
-            //return Ok("CONTROLLER_HIT");
             var user = await _userManager.GetUserAsync(User);
             string userId = user.Id; // string by default
             var bid = new Bid
@@ -38,10 +37,10 @@ namespace BidSphereProject.Controllers
                 AuctionId = auctionId,
                 UserId = userId,
                 Amount = bidAmount,
-                BidTime = DateTime.UtcNow
+                BidTime = DateTime.Now
             };
             int bidId = await _bidRepo.AddBid(bid);
-
+            var incremened=_auctionRepo.IncrementBidCountandbidamount(auctionId,bidAmount); 
             return Ok($"Your bid is placed successfully with ID: {bidId}");
         }
 

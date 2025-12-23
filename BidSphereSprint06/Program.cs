@@ -38,6 +38,8 @@ namespace BidSphereProject
             builder.Services.AddScoped<IAuctionRepository, AuctionRepository>();
             builder.Services.AddScoped<IBidRepository, BidRepository>();
 
+            builder.Services.AddScoped<ICategoryService, CategoryService>();  
+
             builder.Services.AddScoped<AuctionService>(); // for auction creation in auctionServices class
 
 

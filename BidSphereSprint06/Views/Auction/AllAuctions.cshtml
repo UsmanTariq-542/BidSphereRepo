@@ -34,17 +34,6 @@
                         <h1 class="h2 mb-1">All Live Products</h1>
                         <p class="text-muted mb-0">@liveCount live products available across all categories</p>
                     </div>
-                    <div class="d-flex gap-2">
-                        <div class="input-group" style="width: 300px;">
-                            <input type="text" class="form-control" placeholder="Search products...">
-                            <button class="btn btn-outline-secondary" type="button">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                        <a href="@Url.Action("AllAuctions", "Auction", new { id = "Laptops" })" class="btn btn-outline-primary">
-                            <i class="fas fa-filter me-2"></i>Filter by Category
-                        </a>
-                    </div>
                 </div>
             </div>
         </div>
@@ -89,161 +78,20 @@
             </div>
         </div>
 
-        <!-- Category Quick Links -->
-        <div class="row mb-4">
-            <div class="col">
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="card-title mb-3">Browse by Category:</h6>
-                        <div class="d-flex flex-wrap gap-3">
-                            <a href="@Url.Action("IndividualCategory", "Auction", new { id = "Laptops" })" class="category-card text-decoration-none">
-                                <div class="card border-0 shadow-sm text-center h-100" style="width: 140px;">
-                                    <div class="card-body py-4">
-                                        <i class="fas fa-laptop fa-2x text-primary mb-2"></i>
-                                        <h6 class="card-title mb-1">Laptops</h6>
-                                        <small class="text-muted">@Model.Count(a => a.Item.Category == "Laptops") products</small>
-                                    </div>
-                                </div>
-                            </a>
-                            <a href="@Url.Action("IndividualCategory", "Auction", new { id = "Fashion Outfit" })" class="category-card text-decoration-none">
-                                <div class="card border-0 shadow-sm text-center h-100" style="width: 140px;">
-                                    <div class="card-body py-4">
-                                        <i class="fas fa-tshirt fa-2x text-success mb-2"></i>
-                                        <h6 class="card-title mb-1">Fashion</h6>
-                                        <small class="text-muted">@Model.Count(a => a.Item.Category == "Fashion Outfit") products</small>
-                                    </div>
-                                </div>
-                            </a>
-                            <a href="@Url.Action("IndividualCategory", "Auction", new { id = "Home Appliances" })" class="category-card text-decoration-none">
-                                <div class="card border-0 shadow-sm text-center h-100" style="width: 140px;">
-                                    <div class="card-body py-4">
-                                        <i class="fas fa-tv fa-2x text-info mb-2"></i>
-                                        <h6 class="card-title mb-1">Appliances</h6>
-                                        <small class="text-muted">@Model.Count(a => a.Item.Category == "Home Appliances") products</small>
-                                    </div>
-                                </div>
-                            </a>
-                            <a href="@Url.Action("IndividualCategory", "Auction", new { id = "Perfumes" })" class="category-card text-decoration-none">
-                                <div class="card border-0 shadow-sm text-center h-100" style="width: 140px;">
-                                    <div class="card-body py-4">
-                                        <i class="fas fa-spray-can fa-2x text-warning mb-2"></i>
-                                        <h6 class="card-title mb-1">Perfumes</h6>
-                                        <small class="text-muted">@Model.Count(a => a.Item.Category == "Perfumes") products</small>
-                                    </div>
-                                </div>
-                            </a>
-                            <a href="@Url.Action("IndividualCategory", "Auction", new { id = "Luxury Watches" })" class="category-card text-decoration-none">
-                                <div class="card border-0 shadow-sm text-center h-100" style="width: 140px;">
-                                    <div class="card-body py-4">
-                                        <i class="fas fa-clock fa-2x text-danger mb-2"></i>
-                                        <h6 class="card-title mb-1">Watches</h6>
-                                        <small class="text-muted">@Model.Count(a => a.Item.Category == "Luxury Watches") products</small>
-                                    </div>
-                                </div>
-                            </a>
-                            <a href="@Url.Action("IndividualCategory", "Auction", new { id = "Automobile" })" class="category-card text-decoration-none">
-                                <div class="card border-0 shadow-sm text-center h-100" style="width: 140px;">
-                                    <div class="card-body py-4">
-                                        <i class="fas fa-car fa-2x text-secondary mb-2"></i>
-                                        <h6 class="card-title mb-1">Automobile</h6>
-                                        <small class="text-muted">@Model.Count(a => a.Item.Category == "Automobile") products</small>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- Category Quick Links using PARTIAL VIEWS-->
+        @if (ViewBag.CategoryLinks != null)
+        {
+            <partial name="_CategoryLinks" model="ViewBag.CategoryLinks" />
+        }
 
-        <!-- Products Grid -->
+        <!-- Products Grid - USING PARTIAL VIEW -->
         <div class="row">
             @if (Model.Any())
             {
                 foreach (var auction in Model)
                 {
-                    <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
-                        <div class="card h-100 shadow-sm border-0">
-                            <div class="card-header bg-transparent border-bottom-0 pt-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="badge bg-success">Live</span>
-                                    <div>
-                                        <span class="badge bg-secondary">@auction.Item.Category</span>
-                                        <small class="text-muted ms-2">#@auction.Item.Id</small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="card-body">
-                                <!-- Product Image Placeholder with Category-based Icons -->
-                                <div class="text-white rounded-3 text-center py-4 mb-3
-                                    @(auction.Item.Category == "Laptops" ? "bg-primary" :  auction.Item.Category == "Fashion Outfit" ? "bg-success" :
-                                     auction.Item.Category == "Home Appliances" ? "bg-info" :
-                                     auction.Item.Category == "Perfumes" ? "bg-warning" :
-                                     auction.Item.Category == "Luxury Watches" ? "bg-danger" : "bg-secondary")">
-                                    <i class="@(auction.Item.Category == "Laptops" ? "fas fa-laptop" :
-                                    auction.Item.Category == "Fashion Outfit" ? "fas fa-tshirt" :
-                                    auction.Item.Category == "Home Appliances" ? "fas fa-tv" :
-                                    auction.Item.Category == "Perfumes" ? "fas fa-spray-can" :
-                                    auction.Item.Category == "Luxury Watches" ? "fas fa-clock" : "fas fa-car") fa-3x"></i>
-                            </div>
-
-                                <h5 class="card-title">@auction.Item.Name</h5>
-                                <p class="card-text text-muted small mb-3">
-                                    <i class="fas fa-tag me-1"></i>Category: @auction.Item.Category
-                                </p>
-
-                                <!-- Price Information -->
-                                <div class="row g-2 mb-3">
-                                    <div class="col-6">
-                                        <div class="border rounded p-2 text-center">
-                                            <small class="text-muted d-block">Starting Price</small>
-                                            <strong class="text-dark">$@auction.StartingPrice</strong>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="border rounded p-2 text-center bg-light">
-                                            <small class="text-muted d-block">Current Bid</small>
-                                            <strong class="text-primary fs-5">$@auction.CurrentPrice</strong>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Countdown Timer -->
-                                <div class="border rounded p-3 bg-light mb-3">
-                                    <small class="text-muted d-block mb-1">
-                                        <i class="fas fa-clock me-1"></i>Ends in:
-                                    </small>
-                                    <div class="timer text-danger fw-bold fs-6" data-endtime="@auction.EndTime.ToString("yyyy-MM-ddTHH:mm:ss")">
-                                        Loading...
-                                    </div>
-                                </div>
-
-                                <!-- Bidder Information -->
-                                <div class="d-flex justify-content-between align-items-center text-muted small mb-3">
-                                    <span>
-                                        <i class="fas fa-gavel me-1"></i>@auction.BidCount bids
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="card-footer bg-transparent border-top-0 pb-3">
-                                <div class="d-grid gap-2">
-                                    <button class="btn btn-primary btn-lg place-bid-btn"
-                                            data-product-id="@auction.ProductId"
-                                            data-current-price="@auction.CurrentPrice">
-                                        <i class="fas fa-gavel me-2"></i>Place Bid
-                                    </button>
-                                    <div class="d-flex gap-2">
-                                        <button class="btn btn-outline-secondary view-details-btn flex-fill"
-                                                data-product-id="@auction.ProductId">
-                                            <i class="fas fa-info-circle me-2"></i>Details
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Call the partial view for each auction -->
+                    <partial name="_AuctionCard" model="auction" />
                 }
             }
             else
@@ -350,6 +198,7 @@
             $('.place-bid-btn').click(function() {
                 selectedAuctionId = $(this).data('product-id');
                 currentPrice = $(this).data('current-price');
+                var productName = $(this).data('product-name'); // Get product name
 
                 // Populate modal fields
                 $('#currentBidAmount').text(currentPrice);

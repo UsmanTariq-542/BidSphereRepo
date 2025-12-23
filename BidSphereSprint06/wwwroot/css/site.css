@@ -48,3 +48,43 @@ body {
     object-fit: cover;    /* crop to fit square */
     display: block;
 }
+
+/* Hover effects for category cards */
+.category-link-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem 1rem;
+    border: 1px solid #e9ecef;
+    border-radius: 0.75rem;
+    background: white;
+    transition: all 0.2s ease;
+    width: 140px;
+}
+
+.category-link-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        border-color: #0d6efd;
+        text-decoration: none;
+}
+
+.category-icon-wrapper {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+}
+
+/* For the simple version */
+.hover-lift {
+    transition: all 0.2s ease;
+    width: 140px;
+}
+
+.hover-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+}

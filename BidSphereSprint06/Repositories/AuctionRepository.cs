@@ -128,6 +128,34 @@ namespace BidSphereProject.Repositories
             }
         }
 
-        
+        public async Task<int> GetTotalUniqueBiddersCount()
+        {
+            using(SqlConnection con=new SqlConnection(_connectionString))
+            {
+                var sql = "SELECT COUNT(DISTINCT UserId) FROM Bid";
+                return await con.ExecuteScalarAsync<int>(sql);
+            }
+        }
+
+        public async Task<bool> IncrementBidCountandbidamount(int auctionId, decimal bidamount)
+        {
+            try
+            {
+                var sql = "UPDATE Auction SET BidCount = BidCount + 1 , CurrentPrice=bidamount WHERE Id = @AuctionId";
+
+                using (SqlConnection con = new SqlConnection(_connectionString))
+                {
+                    var rowsAffected = await con.ExecuteAsync(sql,new { AuctionId = auctionId });
+
+                    return rowsAffected > 0;
+                }
+                    
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in IncrementBidCount: {ex.Message}");
+                return false;
+            }
+        }
     }
 }

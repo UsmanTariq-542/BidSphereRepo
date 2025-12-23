@@ -21,5 +21,9 @@ namespace BidSphereProject.Interfaces
 
         // Delete
         Task<bool> DeleteAuction(int id);
+
+        Task<int> GetTotalUniqueBiddersCount();
+
+        Task<bool> IncrementBidCountandbidamount(int auctionid,decimal bidamount);
     }
 }
