@@ -14,10 +14,13 @@ namespace BidSphereProject.Interfaces
         Task<Bid> GetHighestBidForAuction(int auctionId);
         Task<IEnumerable<Bid>> GetTopBidsForAuction(int auctionId, int top = 2);  // top N bids, default 2
 
+        Task<int> GetTotalBidsCount();
         // Update
         Task<bool> UpdateBid(Bid bid);
 
         // Delete
         Task<bool> DeleteBid(int id);
+
+        Task<IEnumerable<Bid>> GetLatestBids(int count = 4);
     }
 }

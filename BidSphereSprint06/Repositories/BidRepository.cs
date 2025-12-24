@@ -25,6 +25,29 @@ namespace BidSphereProject.Repositories
             }
         }
 
+        public async Task<int> GetTotalBidsCount()
+        {
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            {
+                string sql = "SELECT COUNT(*) FROM Bid";
+                return await con.ExecuteScalarAsync<int>(sql);
+            }
+        }
+
+        public async Task<IEnumerable<Bid>> GetLatestBids(int count = 4)
+        {
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            {
+                string sql = @"
+            SELECT TOP (@Count) *
+            FROM Bid
+            ORDER BY BidTime DESC";
+
+                var bids = await con.QueryAsync<Bid>(sql, new { Count = count });
+                return bids;
+            }
+        }
+
         // Read
         public async Task<Bid> GetBidById(int id)
         {

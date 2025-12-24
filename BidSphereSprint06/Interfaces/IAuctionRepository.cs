@@ -25,5 +25,9 @@ namespace BidSphereProject.Interfaces
         Task<int> GetTotalUniqueBiddersCount();
 
         Task<bool> IncrementBidCountandbidamount(int auctionid,decimal bidamount);
+
+        Task<int> GetAuctionCount();
+
+        Task<decimal> CalculateRevenue(decimal commissionRate = 0.05m);
     }
 }

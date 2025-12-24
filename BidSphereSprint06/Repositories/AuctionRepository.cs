@@ -7,10 +7,12 @@ namespace BidSphereProject.Repositories
     public class AuctionRepository: IAuctionRepository
     {
         private readonly string _connectionString;
+        private readonly IProductRepository _productRepo;
 
-        public AuctionRepository(IConfiguration config)
+        public AuctionRepository(IConfiguration config,IProductRepository productRepo)
         {
             _connectionString = config.GetConnectionString("DefaultConnection");
+            _productRepo = productRepo;
         }
 
 
@@ -34,6 +36,7 @@ namespace BidSphereProject.Repositories
             {
                 string sqlcmd = "Select * from Auction where Id=@Id";
                 Auction auction = await con.QuerySingleOrDefaultAsync<Auction>(sqlcmd, new { Id = id });
+                auction.Item = await _productRepo.GetProductById(auction.Id);
                 return auction;
             }
         }
@@ -53,6 +56,31 @@ namespace BidSphereProject.Repositories
                 string sqlcmd = "Select * from Auction";
                 IEnumerable<Auction> auctions=await con.QueryAsync<Auction>(sqlcmd);
                 return auctions;
+            }
+        }
+
+        public async Task<int> GetAuctionCount()
+        {
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            {
+                string sql = "SELECT COUNT(*) FROM Auction where EndTime>GETDATE()";
+                int count = await con.ExecuteScalarAsync<int>(sql);
+                return count;
+            }
+        }
+
+        public async Task<decimal> CalculateRevenue(decimal commissionRate = 0.05m)
+        {
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            {
+                string sql = @"
+            SELECT ISNULL(SUM(CurrentPrice * @Rate), 0)
+            FROM Auction";
+
+                return await con.ExecuteScalarAsync<decimal>(sql, new
+                {
+                    Rate = commissionRate
+                });
             }
         }
 

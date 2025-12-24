@@ -30,18 +30,26 @@ namespace BidSphereProject.Controllers
         [Authorize]
         public async Task<IActionResult> PlaceBid(int auctionId, decimal bidAmount)
         {
-            var user = await _userManager.GetUserAsync(User);
-            string userId = user.Id; // string by default
-            var bid = new Bid
+            try
             {
-                AuctionId = auctionId,
-                UserId = userId,
-                Amount = bidAmount,
-                BidTime = DateTime.Now
-            };
-            int bidId = await _bidRepo.AddBid(bid);
-            var incremened=_auctionRepo.IncrementBidCountandbidamount(auctionId,bidAmount); 
-            return Ok($"Your bid is placed successfully with ID: {bidId}");
+                var user = await _userManager.GetUserAsync(User);
+                string userId = user.Id; // string by default
+                var bid = new Bid
+                {
+                    AuctionId = auctionId,
+                    UserId = userId,
+                    Amount = bidAmount,
+                    BidTime = DateTime.Now
+                };
+                int bidId = await _bidRepo.AddBid(bid);
+                var incremened = _auctionRepo.IncrementBidCountandbidamount(auctionId, bidAmount);
+                return Ok($"Your bid is placed successfully with ID: {bidId}");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+
         }
 
         public IActionResult GetBidsByAuction(int auctionId)

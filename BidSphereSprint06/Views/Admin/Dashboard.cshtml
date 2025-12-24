@@ -1,4 +1,7 @@
-﻿@{
+﻿@using BidSphereProject.ViewModels
+@model DashboardViewModel
+
+@{
     Layout = null;
 }
 <!DOCTYPE html>
@@ -410,10 +413,6 @@
                     <i class="fas fa-plus-circle"></i>
                     <span>Create Auction</span>
                 </li>
-                <li data-section="view-auctions">
-                    <i class="fas fa-gavel"></i>
-                    <span>View Live Auctions</span>
-                </li>
 
                 <!-- Send notification -->
                 <li style="height: 49px; padding: 12px 20px;">
@@ -446,7 +445,7 @@
                         <i class="fas fa-gavel"></i>
                     </div>
                     <div class="stat-info">
-                        <h3 id="live-auctions-count">12</h3>
+                        <h3 id="live-auctions-count">@Model.LiveAuctionsCount</h3>
                         <p>Live Auctions</p>
                     </div>
                 </div>
@@ -455,8 +454,8 @@
                         <i class="fas fa-list"></i>
                     </div>
                     <div class="stat-info">
-                        <h3 id="total-bidded-auctions">9</h3>
-                        <p>Total Bidded Active Auctions</p>
+                        <h3 id="total-bidded-auctions">@Model.TotalBids</h3>
+                        <p>Total Bids Placed</p>
                     </div>
                 </div>
                 <div class="stat-card">
@@ -464,7 +463,7 @@
                         <i class="fas fa-users"></i>
                     </div>
                     <div class="stat-info">
-                        <h3 id="total-registered-users">28</h3>
+                        <h3 id="total-registered-users">@Model.TotalRegisteredUsers</h3>
                         <p>Registered Users</p>
                     </div>
                 </div>
@@ -473,7 +472,7 @@
                         <i class="fas fa-dollar-sign"></i>
                     </div>
                     <div class="stat-info">
-                        <h3 id="revenue-generated">$1,250</h3>
+                        <h3 id="revenue-generated">@Model.RevenueGenerated</h3>
                         <p>Revenue Generated</p>
                     </div>
                 </div>
@@ -492,42 +491,19 @@
                             <th>Time</th>
                         </tr>
                     </thead>
+
                     <tbody>
-                        <tr>
-                            <td>MacBook Pro 2023</td>
-                            <td>john_doe</td>
-                            <td><span class="badge badge-success">Bid Placed</span></td>
-                            <td>$1,450</td>
-                            <td>2 minutes ago</td>
-                        </tr>
-                        <tr>
-                            <td>Rolex Submariner</td>
-                            <td>alex_wong</td>
-                            <td><span class="badge badge-success">Bid Placed</span></td>
-                            <td>$7,200</td>
-                            <td>5 minutes ago</td>
-                        </tr>
-                        <tr>
-                            <td>iPhone 14 Pro</td>
-                            <td>mike_jones</td>
-                            <td><span class="badge badge-success">Bid Placed</span></td>
-                            <td>$950</td>
-                            <td>15 minutes ago</td>
-                        </tr>
-                        <tr>
-                            <td>Designer Dress</td>
-                            <td>emma_roberts</td>
-                            <td><span class="badge badge-success">Bid Placed</span></td>
-                            <td>$220</td>
-                            <td>25 minutes ago</td>
-                        </tr>
-                        <tr>
-                            <td>Refrigerator</td>
-                            <td>sarah_wilson</td>
-                            <td><span class="badge badge-success">Bid Placed</span></td>
-                            <td>$550</td>
-                            <td>30 minutes ago</td>
-                        </tr>
+                        @foreach (var activity in Model.RecentBidActivities)
+                        {
+                            <tr>
+                                <td>@activity.AuctionName</td>
+                                <td>@activity.BidderUsername</td>
+                                <td>@activity.Action</td>
+                                <td>@activity.BidAmount</td>
+                                <td>@activity.TimeAgo</td>
+                            </tr>
+                        }
+
                     </tbody>
                 </table>
             </div>
@@ -577,83 +553,9 @@
                 </form>
             </div>
         </div>
-
-        <!-- View Live Auctions Section -->
-        <div id="view-auctions" class="section">
-            <div class="filter-container">
-                <h2>Live Auctions</h2>
-                <div class="category-filter">
-                    <button class="filter-btn active" data-category="all">All</button>
-                    <button class="filter-btn" data-category="Fashion Outfit">Fashion</button>
-                    <button class="filter-btn" data-category="Home Appliances">Appliances</button>
-                    <button class="filter-btn" data-category="Laptops">Laptops</button>
-                    <button class="filter-btn" data-category="Perfumes">Perfumes</button>
-                    <button class="filter-btn" data-category="Luxury Watches">Watches</button>
-                    <button class="filter-btn" data-category="Automobile">Automobile</button>
-                </div>
-            </div>
-
-            <div class="table-container">
-                <table id="live-auctions-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Category</th>
-                            <th>Starting Price</th>
-                            <th>Current Price</th>
-                            <th>Expires In</th>
-                            <th>Bid Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Data will be populated by JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
     </div>
 
     <script>
-        // Sample data for live auctions
-        const liveAuctions = [
-            {
-                id: 1,
-                name: "MacBook Pro 2023",
-                category: "Laptops",
-                startingPrice: 1200,
-                currentPrice: 1450,
-                endTime: new Date(Date.now() + 2 * 60 * 1000), // 2 minutes from now
-                status: "active"
-            },
-            {
-                id: 2,
-                name: "Rolex Submariner",
-                category: "Luxury Watches",
-                startingPrice: 5000,
-                currentPrice: 7200,
-                endTime: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes from now
-                status: "active"
-            },
-            {
-                id: 3,
-                name: "Designer Dress",
-                category: "Fashion Outfit",
-                startingPrice: 150,
-                currentPrice: 220,
-                endTime: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes from now
-                status: "active"
-            },
-            {
-                id: 4,
-                name: "Refrigerator",
-                category: "Home Appliances",
-                startingPrice: 400,
-                currentPrice: 550,
-                endTime: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes from now
-                status: "active"
-            }
-        ];
 
         // Sidebar navigation
         document.querySelectorAll('.sidebar-menu li').forEach(item => {
@@ -690,86 +592,7 @@
             });
         });
 
-        // Category filter for live auctions
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                // Remove active class from all filter buttons
-                document.querySelectorAll('.filter-btn').forEach(b => {
-                    b.classList.remove('active');
-                });
-
-                // Add active class to clicked button
-                this.classList.add('active');
-
-                // Filter auctions
-                const category = this.getAttribute('data-category');
-                filterAuctions(category);
-            });
-        });
-
-        // Filter auctions by category
-        function filterAuctions(category) {
-            const tableBody = document.querySelector('#live-auctions-table tbody');
-            tableBody.innerHTML = '';
-
-            const filteredAuctions = category === 'all'
-                ? liveAuctions
-                : liveAuctions.filter(auction => auction.category === category);
-
-            filteredAuctions.forEach(auction => {
-                const row = document.createElement('tr');
-                const timeLeft = calculateTimeLeft(auction.endTime);
-
-                row.innerHTML = `
-                    <td>${auction.name}</td>
-                    <td>${auction.category}</td>
-                    <td>$${auction.startingPrice}</td>
-                    <td>$${auction.currentPrice}</td>
-                    <td class="timer" data-end="${auction.endTime.getTime()}">${timeLeft}</td>
-                    <td><span class="badge badge-success">Active</span></td>
-                    <td class="action-buttons">
-                        <button class="btn btn-primary" onclick="editAuction(${auction.id})">Update</button>
-                        <button class="btn btn-danger" onclick="deleteAuction(${auction.id})">Delete</button>
-                    </td>
-                `;
-
-                tableBody.appendChild(row);
-            });
-        }
-
-        // Calculate time left for auction
-        function calculateTimeLeft(endTime) {
-            const now = new Date();
-            const timeDiff = endTime - now;
-
-            if (timeDiff <= 0) {
-                return "Expired";
-            }
-
-            const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
-
-            return `${minutes}min ${seconds}sec`;
-        }
-
-        // Update timers every second
-        function updateTimers() {
-            document.querySelectorAll('.timer').forEach(timer => {
-                const endTime = parseInt(timer.getAttribute('data-end'));
-                const now = new Date().getTime();
-                const timeDiff = endTime - now;
-
-                if (timeDiff <= 0) {
-                    timer.textContent = "Expired";
-                    // In a real application, you would update the auction status here
-                } else {
-                    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
-                    timer.textContent = `${minutes}min ${seconds}sec`;
-                }
-            });
-        }
-
+        
         // Initialize the dashboard
         function initDashboard() {
             // Populate live auctions table
@@ -784,19 +607,6 @@
                 alert('Auction created successfully!');
                 this.reset();
             });
-        }
-
-        // Auction management functions
-        function editAuction(id) {
-            alert(`Editing auction with ID: ${id}`);
-            // In a real application, this would open a form with the auction details
-        }
-
-        function deleteAuction(id) {
-            if (confirm('Are you sure you want to delete this auction?')) {
-                alert(`Auction with ID: ${id} deleted`);
-                // In a real application, this would remove the auction from the database
-            }
         }
 
         // Initialize the dashboard when the page loads

@@ -236,10 +236,9 @@
                         $(`[data-product-id=${selectedAuctionId}]`).data('current-price', bidValue);
                         $(`[data-product-id=${selectedAuctionId}]`).closest('.card').find('.text-primary.fs-5').text(`$${bidValue}`);
                     },
-                    error: function(err) {
-                        $('#bidError').text('Error placing bid. Try again.').show();
-                    }
-                });
+                    error: function (xhr) {
+                        alert(xhr.responseText);}
+                    });
             });
 
             $('.view-details-btn').click(function() {
