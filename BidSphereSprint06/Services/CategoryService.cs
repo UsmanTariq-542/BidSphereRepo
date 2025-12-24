@@ -26,16 +26,6 @@ namespace BidSphereProject.Services
             if (allAuctions == null)
                 allAuctions = new List<Auction>();
 
-            // Helper method to safely count auctions by category
-            int CountByCategory(string categoryName)
-            {
-                return allAuctions.Count(a =>
-                    a != null &&
-                    a.Item != null &&
-                    a.Item.Category == categoryName
-                );
-            }
-
             var categories = new List<CategoryLinkViewModel>
             {
                 new CategoryLinkViewModel
@@ -75,7 +65,7 @@ namespace BidSphereProject.Services
                 },
                 new CategoryLinkViewModel
                 {
-                    CategoryName = "Automobile",
+                    CategoryName = "Automobiles",
                     DisplayName = "Automobile",
                     IconClass = "fas fa-car",
                     ColorClass = "text-secondary"

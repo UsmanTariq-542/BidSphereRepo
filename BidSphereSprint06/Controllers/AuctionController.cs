@@ -5,6 +5,7 @@ using BidSphereProject.Services;
 using BidSphereProject.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace BidSphereProject.Controllers
 {
@@ -52,6 +53,10 @@ namespace BidSphereProject.Controllers
 
             ViewBag.CategoryName = id;
             ViewBag.ProductCount = categoryAuctions.Count();
+            ViewBag.TotalBidders = await _auctionRepo.GetTotalUniqueBiddersCount(); // ← Changed this
+            ViewBag.TotalBidValue = categoryAuctions.Sum(a => a.CurrentPrice);
+            ViewBag.EndingSoon = categoryAuctions.Count(a => a.EndTime != null && a.EndTime < DateTime.Now.AddHours(1));
+
 
             return View(categoryAuctions);
         }

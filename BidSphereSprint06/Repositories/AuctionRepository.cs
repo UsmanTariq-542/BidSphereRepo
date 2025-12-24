@@ -89,9 +89,12 @@ namespace BidSphereProject.Repositories
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
                 string sql = @"SELECT a.*, p.*
-                       FROM Auction a
-                       INNER JOIN Product p ON a.ProductId = p.Id
-                       WHERE LOWER(p.Category) = LOWER(@Category)";
+                    FROM Auction a
+                    INNER JOIN Product p ON a.ProductId = p.Id
+                    WHERE LOWER(p.Category) = LOWER(@Category)
+                      AND a.StartTime <= GETDATE()
+                      AND a.EndTime > GETDATE()
+                    ORDER BY a.StartTime DESC;";
 
                 return await con.QueryAsync<Auction, Product, Auction>(   // obj1,obj2,returntype
                     sql,
