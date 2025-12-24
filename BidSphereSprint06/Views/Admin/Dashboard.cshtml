@@ -511,51 +511,16 @@
 
         <!-- Create Auction Section -->
         <div id="create-auction" class="section">
-            <div class="form-container">
-                <h2>Create New Auction</h2>
-                <form id="auction-form">
-                    <div class="form-group">
-                        <label for="auction-name">Product Name</label>
-                        <input type="text" id="auction-name" class="form-control" placeholder="Enter product name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="auction-category">Category</label>
-                        <select id="auction-category" class="form-control" required>
-                            <option value="">Select Category</option>
-                            <option value="Fashion Outfit">Fashion Outfit</option>
-                            <option value="Home Appliances">Home Appliances</option>
-                            <option value="Laptops">Laptops</option>
-                            <option value="Perfumes">Perfumes</option>
-                            <option value="Luxury Watches">Luxury Watches</option>
-                            <option value="Automobile">Automobile</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="starting-price">Starting Price ($)</label>
-                        <input type="number" id="starting-price" class="form-control" placeholder="Enter starting price" min="0" step="0.01" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="auction-description">Description</label>
-                        <textarea id="auction-description" class="form-control" rows="4" placeholder="Enter auction description"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="duration-value">Duration</label>
-                        <div style="display: flex; gap: 10px;">
-                            <input type="number" id="duration-value" class="form-control" placeholder="Duration value" min="1" required>
-                            <select id="duration-unit" class="form-control" required>
-                                <option value="minutes">Minutes</option>
-                                <option value="hours">Hours</option>
-                                <option value="days">Days</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Create Auction</button>
-                </form>
+            <!-- This will load the partial view -->
+            <div id="create-auction-content">
+                @await Html.PartialAsync("_CreateAuctionPartial", new CreateAuctionViewModel())
             </div>
         </div>
     </div>
 
     <script>
+        // Store current active section
+        let currentSection = 'dashboard';
 
         // Sidebar navigation
         document.querySelectorAll('.sidebar-menu li').forEach(item => {
@@ -567,8 +532,10 @@
                     // It's a link to another page, let it navigate naturally
                     return;
                 }
+
                 // Otherwise, handle as section switching
                 e.preventDefault();
+
                 // Remove active class from all items
                 document.querySelectorAll('.sidebar-menu li').forEach(li => {
                     li.classList.remove('active');
@@ -586,31 +553,246 @@
                 const sectionId = this.getAttribute('data-section');
                 document.getElementById(sectionId).classList.add('active');
 
+                // Update current section
+                currentSection = sectionId;
+
                 // Update section title
-                document.getElementById('section-title').textContent =
-                    this.querySelector('span').textContent;
+                const spanText = this.querySelector('span');
+                if (spanText) {
+                    document.getElementById('section-title').textContent = spanText.textContent;
+                }
+
+                // Initialize the newly shown section
+                initializeSection(sectionId);
             });
         });
 
-        
-        // Initialize the dashboard
+        // Initialize specific section based on ID
+        function initializeSection(sectionId) {
+            switch(sectionId) {
+                case 'dashboard':
+                    initDashboard();
+                    break;
+                case 'create-auction':
+                    initCreateAuction();
+                    break;
+                // Add other sections as needed
+            }
+        }
+
+        // Initialize dashboard section
         function initDashboard() {
+            console.log('Initializing Dashboard...');
+
             // Populate live auctions table
-            filterAuctions('all');
+            if (typeof filterAuctions === 'function') {
+                filterAuctions('all');
+            }
 
             // Start timer updates
-            setInterval(updateTimers, 1000);
+            if (typeof updateTimers === 'function') {
+                setInterval(updateTimers, 1000);
+            }
 
-            // Handle auction form submission
-            document.getElementById('auction-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                alert('Auction created successfully!');
-                this.reset();
+            // You can also load dashboard data via AJAX here
+            loadDashboardData();
+        }
+
+        // Initialize create auction section
+        function initCreateAuction() {
+            console.log('Initializing Create Auction Form...');
+
+            // Wait a bit for the section to be fully rendered
+            setTimeout(() => {
+                const auctionForm = document.getElementById('auction-form');
+
+                if (auctionForm) {
+                    // Remove any existing event listeners first
+                    const newForm = auctionForm.cloneNode(true);
+                    auctionForm.parentNode.replaceChild(newForm, auctionForm);
+
+                    // Add new event listener
+                    newForm.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        handleAuctionFormSubmit(this);
+                    });
+
+                    console.log('Auction form event listener attached');
+                } else {
+                    console.error('Auction form not found!');
+                }
+            }, 50);
+        }
+
+        // Handle auction form submission
+        async function handleAuctionFormSubmit(form) {
+            // Show loading state
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+            submitBtn.disabled = true;
+
+            try {
+                // Get form data
+                const formData = new FormData(form);
+
+                // If you're using AJAX (recommended)
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Show success message
+                    showNotification(result.message, 'success');
+
+                    // Reset form
+                    form.reset();
+
+                    // Reset duration fields to defaults
+                    if (document.getElementById('DurationDays')) {
+                        document.getElementById('DurationDays').value = 0;
+                        document.getElementById('DurationHours').value = 0;
+                        document.getElementById('DurationMinutes').value = 1;
+                        document.getElementById('DurationSeconds').value = 0;
+                    }
+
+                    // Update duration summary if function exists
+                    if (typeof updateDurationSummary === 'function') {
+                        updateDurationSummary();
+                    }
+
+                    // Optional: Switch back to dashboard
+                    // switchToSection('dashboard');
+                } else {
+                    showNotification(result.message || 'Error creating auction', 'error');
+
+                    // Show validation errors if any
+                    if (result.errors) {
+                        result.errors.forEach(error => {
+                            showNotification(error, 'error');
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('An error occurred. Please try again.', 'error');
+            } finally {
+                // Restore button
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Load dashboard data via AJAX
+        async function loadDashboardData() {
+            try {
+                const response = await fetch('/Admin/GetDashboardStats');
+                const data = await response.json();
+
+                // Update dashboard stats
+                if (data.liveAuctionsCount !== undefined) {
+                    document.getElementById('live-auctions-count').textContent = data.liveAuctionsCount;
+                }
+                if (data.totalBids !== undefined) {
+                    document.getElementById('total-bids').textContent = data.totalBids;
+                }
+                if (data.totalRegisteredUsers !== undefined) {
+                    document.getElementById('total-registered-users').textContent = data.totalRegisteredUsers;
+                }
+                if (data.revenueGenerated !== undefined) {
+                    document.getElementById('revenue-generated').textContent = '$' + data.revenueGenerated.toLocaleString();
+                }
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        // Show notification
+        function showNotification(message, type) {
+            // Remove existing notifications
+            const existingAlerts = document.querySelectorAll('.alert-dismissible');
+            existingAlerts.forEach(alert => {
+                alert.remove();
             });
+
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+
+            const notification = document.createElement('div');
+            notification.className = `alert ${alertClass} alert-dismissible fade show`;
+            notification.setAttribute('role', 'alert');
+            notification.innerHTML = `
+                <i class="fas ${icon} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            // Add to current section
+            const currentSection = document.querySelector('.section.active');
+            if (currentSection) {
+                currentSection.prepend(notification);
+            }
+
+            // Auto-remove success notifications
+            if (type === 'success') {
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 5000);
+            }
+        }
+
+        // Helper function to switch sections programmatically
+        function switchToSection(sectionId) {
+            const sectionItem = document.querySelector(`.sidebar-menu li[data-section="${sectionId}"]`);
+            if (sectionItem) {
+                sectionItem.click();
+            }
+        }
+
+        // Initialize other sections (add as needed)
+        function initManageAuctions() {
+            console.log('Initializing Manage Auctions...');
+            // Load auctions list via AJAX
+            loadAuctionsList();
+        }
+
+        function initUsers() {
+            console.log('Initializing Users...');
+            // Load users list via AJAX
+            loadUsersList();
+        }
+
+        // Load auctions list
+        async function loadAuctionsList() {
+            // Implement AJAX call to get auctions
+        }
+
+        // Load users list
+        async function loadUsersList() {
+            // Implement AJAX call to get users
         }
 
         // Initialize the dashboard when the page loads
-        window.onload = initDashboard;
+        window.onload = function() {
+            console.log('Page loaded, initializing dashboard...');
+
+            // Initialize the active section (default is dashboard)
+            initializeSection(currentSection);
+
+            // Also attach form listener immediately if create-auction section is active
+            const activeSection = document.querySelector('.section.active');
+            if (activeSection && activeSection.id === 'create-auction') {
+                initCreateAuction();
+            }
+        };
     </script>
 </body>
 </html>

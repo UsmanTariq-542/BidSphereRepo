@@ -21,8 +21,8 @@ namespace BidSphereProject.Repositories
         {
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                string sql = @"INSERT INTO Auction (ProductId, StartingPrice, StartTime, EndTime)
-                               VALUES (@ProductId, @StartingPrice, @StartTime, @EndTime);
+                string sql = @"INSERT INTO Auction (ProductId, StartingPrice, StartTime, EndTime,Status,BidCount,CurrentPrice)
+                               VALUES (@ProductId, @StartingPrice, @StartTime, @EndTime,@Status,@BidCount,@CurrentPrice);
                                SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
                 return await con.QuerySingleAsync<int>(sql, auction);

@@ -192,23 +192,60 @@ public class AdminController : Controller
         return View(new CreateAuctionViewModel());
     }
 
-    // Create Auction Action
+    [HttpGet]
+    public IActionResult CreateAuctionPartial()
+    {
+        // Return partial view for dashboard
+        var model = new CreateAuctionViewModel();
+        return PartialView("_CreateAuctionPartial", model);
+    }
+
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateAuction(CreateAuctionViewModel model)
     {
         if (!ModelState.IsValid)
-            return View(model);
+        {
+            var errors = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage)
+                .ToList();
+
+            return Json(new
+            {
+                success = false,
+                message = "Please fix the following errors:",
+                errors = errors
+            });
+        }
 
         try
         {
-            await _auctionService.CreateAuction(model);
-            TempData["SuccessMessage"] = "Auction created successfully!";
+            int auctionId = await _auctionService.CreateAuction(model);
+
+            return Json(new
+            {
+                success = true,
+                message = $"Auction created successfully! (ID: {auctionId})",
+                auctionId = auctionId,
+                redirectUrl = Url.Action("Dashboard", "Admin")
+            });
+        }
+        catch (ArgumentException ex)
+        {
+            return Json(new
+            {
+                success = false,
+                message = ex.Message
+            });
         }
         catch (Exception ex)
         {
-            TempData["ErrorMessage"] = $"Error creating auction: {ex.Message}";
+            return Json(new
+            {
+                success = false,
+                message = $"An error occurred while creating the auction. Please try again later, {ex.Message}"
+            });
         }
-
-        return RedirectToAction("Dashboard");
     }
 }
