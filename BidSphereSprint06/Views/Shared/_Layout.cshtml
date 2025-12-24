@@ -153,6 +153,21 @@
     <script src="/lib/jquery/dist/jquery.min.js"></script>
     <script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/site.js" asp-append-version="true"></script>
+
+    <!-- SignalR scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+
+    <script>
+        const connection = new signalR.HubConnectionBuilder().withUrl("/notificationHub").withAutomaticReconnect().build();
+
+        connection.on("ReceiveNotification", function (Message,Timestamp) {  // Listen for messages sent by server for this above url given
+            const time = new Date(Timestamp).toLocaleString();
+            alert(`Message:  ${Message} \nTime: ${time}`);  // jb server koi msg send kre to vo msg client side p popup ya alert ki form m show ho ga
+        });
+
+        connection.start().catch(err => console.error(err.toString()));  // connection.start opens the connection
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

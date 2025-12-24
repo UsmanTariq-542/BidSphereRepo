@@ -1,4 +1,5 @@
 using BidSphereProject.Data;
+using BidSphereProject.Hubs;
 using BidSphereProject.Interfaces;
 using BidSphereProject.Repositories;
 using BidSphereProject.Services;
@@ -25,6 +26,7 @@ namespace BidSphereProject
             builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddControllersWithViews();
+            builder.Services.AddSignalR();
 
             builder.Services.AddAuthentication()
                 .AddGoogle(googleOptions =>
@@ -79,6 +81,7 @@ namespace BidSphereProject
             app.UseAuthorization();
 
             app.MapStaticAssets();
+            app.MapHub<NotificationHub>("/notificationHub");
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")
