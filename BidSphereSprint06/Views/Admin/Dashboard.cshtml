@@ -349,6 +349,59 @@
             transition: all 0.3s;
         }
 
+        /* Dashboard.cshtml ke style section mein (~line 200 ke baad) */
+
+        /* Modal Styling */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        /* Text Colors */
+        .text-success {
+            color: #28a745 !important;
+        }
+
+        .text-warning {
+            color: #ffc107 !important;
+        }
+
+        .text-danger {
+            color: #dc3545 !important;
+        }
+
+        /* Button Styling */
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.875rem;
+        }
+
+        /* Spacing for time inputs */
+        .d-flex.gap-2 > * {
+            margin-right: 10px;
+        }
+
+            .d-flex.gap-2 > *:last-child {
+                margin-right: 0;
+            }
+
             .filter-btn.active {
                 background-color: var(--primary);
                 color: white;
@@ -414,6 +467,10 @@
                     <span>Create Auction</span>
                 </li>
 
+                <li data-section="live-auctions">
+                    <i class="fas fa-eye"></i>
+                    <span>View Live Auctions</span>
+                </li>
                 <!-- Send notification -->
                 <li style="height: 49px; padding: 12px 20px;">
                     <a href="/Notification/SendNotification"
@@ -516,6 +573,49 @@
                 @await Html.PartialAsync("_CreateAuctionPartial", new CreateAuctionViewModel())
             </div>
         </div>
+
+        <!-- Line ~230 ke baad, "Create Auction Section" ke baad -->
+        <!-- Create Auction Section -->
+        <div id="create-auction" class="section">
+            <!-- This will load the partial view -->
+            <div id="create-auction-content">
+                @await Html.PartialAsync("_CreateAuctionPartial", new CreateAuctionViewModel())
+            </div>
+        </div>
+
+        <!-- Create Auction Section -->
+        <div id="create-auction" class="section">
+            <div id="create-auction-content">
+                @await Html.PartialAsync("_CreateAuctionPartial", new CreateAuctionViewModel())
+            </div>
+        </div>
+
+        <!-- YEH NAYA SECTION ADD KAREIN -->
+        <!-- Live Auctions Section -->
+        <div id="live-auctions" class="section">
+            <div class="table-container">
+                <h2 style="padding: 20px 20px 0;">Live Auctions</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Starting Price</th>
+                            <th>Current Price</th>
+                            <th>End Time</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="live-auctions-body">
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 40px;">
+                                <i class="fas fa-spinner fa-spin"></i> Loading auctions...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -576,7 +676,9 @@
                 case 'create-auction':
                     initCreateAuction();
                     break;
-                // Add other sections as needed
+                case 'live-auctions':
+                    initLiveAuctions();
+                    break;
             }
         }
 
@@ -710,6 +812,243 @@
                 }
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
+            }
+        }
+
+                function initLiveAuctions() {
+            console.log('Loading live auctions...');
+            loadLiveAuctions();
+
+            // Auto-refresh every 30 seconds
+            setInterval(updateLiveAuctionTimers, 1000);
+        }
+
+        async function loadLiveAuctions() {
+            try {
+                const response = await fetch('/Admin/GetLiveAuctions');
+                const auctions = await response.json();
+                renderLiveAuctions(auctions);
+            } catch (error) {
+                console.error('Error loading auctions:', error);
+                document.getElementById('live-auctions-body').innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px; color: var(--danger);">
+                            <i class="fas fa-exclamation-circle"></i> Failed to load auctions
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function renderLiveAuctions(auctions) {
+            const tbody = document.getElementById('live-auctions-body');
+
+            if (!auctions || auctions.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px;">
+                            <i class="fas fa-info-circle"></i> No live auctions available
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            let html = '';
+
+            auctions.forEach(auction => {
+                const endTime = new Date(auction.endTime);
+                const now = new Date();
+                const diffMs = endTime - now;
+
+                let timeRemaining = 'Ended';
+                let timeClass = 'text-danger';
+
+                if (diffMs > 0) {
+                    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                    timeRemaining = `${days}d ${hours}h ${minutes}m`;
+
+                    // Color coding
+                    if (days === 0 && hours < 24) {
+                        timeClass = 'text-danger'; // Less than 1 day
+                    } else if (days < 3) {
+                        timeClass = 'text-warning'; // Less than 3 days
+                    } else {
+                        timeClass = 'text-success'; // More than 3 days
+                    }
+                }
+
+                html += `
+                    <tr>
+                        <td>${auction.productName}</td>
+                        <td>${auction.category}</td>
+                        <td>$${auction.startingPrice.toFixed(2)}</td>
+                        <td><strong>$${auction.currentPrice.toFixed(2)}</strong></td>
+                        <td class="${timeClass}" data-end-time="${auction.endTime}">
+                            ${timeRemaining}
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-warning edit-endtime"
+                                    onclick="showEditModal(${auction.auctionId}, '${auction.productName.replace(/'/g, "\\'")}')">
+                                <i class="fas fa-clock"></i> Edit Time
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        // Timer update
+        function updateLiveAuctionTimers() {
+            document.querySelectorAll('[data-end-time]').forEach(cell => {
+                const endTime = new Date(cell.getAttribute('data-end-time'));
+                const now = new Date();
+                const diffMs = endTime - now;
+
+                if (diffMs <= 0) {
+                    cell.textContent = 'Ended';
+                    cell.className = 'text-danger';
+                    return;
+                }
+
+                const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                cell.textContent = `${days}d ${hours}h ${minutes}m`;
+            });
+        }
+
+                function showEditModal(auctionId, productName) {
+            const modalHTML = `
+                <div class="modal-overlay" onclick="closeModal(event)">
+                    <div class="modal-content" onclick="event.stopPropagation()">
+                        <h4>Set New End Time</h4>
+                        <p class="mb-2"><strong>Product:</strong> ${productName}</p>
+
+                        <div class="mb-3">
+                            <label><strong>Enter new end time:</strong></label>
+                            <div class="d-flex gap-2 mb-1">
+                                <div style="flex: 1;">
+                                    <input type="number" id="editDays" class="form-control"
+                                           placeholder="Days" min="0" value="1"
+                                           oninput="validatePositive(this)">
+                                    <div class="small text-center">Days</div>
+                                </div>
+                                <div style="flex: 1;">
+                                    <input type="number" id="editHours" class="form-control"
+                                           placeholder="Hours" min="0" max="23" value="0"
+                                           oninput="validatePositive(this)">
+                                    <div class="small text-center">Hours</div>
+                                </div>
+                                <div style="flex: 1;">
+                                    <input type="number" id="editMinutes" class="form-control"
+                                           placeholder="Minutes" min="0" max="59" value="0"
+                                           oninput="validatePositive(this)">
+                                    <div class="small text-center">Minutes</div>
+                                </div>
+                            </div>
+                            <div class="small text-muted">
+                                <i class="fas fa-info-circle"></i> Auction will end after this duration from now
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <button class="btn btn-secondary" onclick="closeModal(event)">Cancel</button>
+                            <button class="btn btn-primary" onclick="saveNewTime(${auctionId})">
+                                <i class="fas fa-check"></i> Set End Time
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
+
+        // Validation function
+        function validatePositive(input) {
+            if (input.value < 0) {
+                input.value = 0;
+            }
+        }
+
+        function closeModal(event) {
+            const modal = document.querySelector('.modal-overlay');
+            if (modal) modal.remove();
+        }
+
+        async function saveNewTime(auctionId) {
+            const daysInput = document.getElementById('editDays');
+            const hoursInput = document.getElementById('editHours');
+            const minutesInput = document.getElementById('editMinutes');
+
+            // Force positive values
+            const days = Math.max(0, parseInt(daysInput.value) || 0);
+            const hours = Math.max(0, Math.min(23, parseInt(hoursInput.value) || 0));
+            const minutes = Math.max(0, Math.min(59, parseInt(minutesInput.value) || 0));
+
+            // Update inputs with corrected values
+            daysInput.value = days;
+            hoursInput.value = hours;
+            minutesInput.value = minutes;
+
+            // Check if all are zero
+            if (days === 0 && hours === 0 && minutes === 0) {
+                alert('Please enter a valid time (minimum 1 minute)');
+                return;
+            }
+
+            // Also validate on server side
+            if (days < 0 || hours < 0 || minutes < 0) {
+                alert('Time values cannot be negative');
+                return;
+            }
+
+            if (hours > 23) {
+                alert('Hours cannot be more than 23');
+                return;
+            }
+
+            if (minutes > 59) {
+                alert('Minutes cannot be more than 59');
+                return;
+            }
+
+            // Calculate new end time
+            const now = new Date();
+            const msToAdd = (days * 24 * 60 * 60 * 1000) +
+                           (hours * 60 * 60 * 1000) +
+                           (minutes * 60 * 1000);
+            const newEndTime = new Date(now.getTime() + msToAdd).toISOString();
+
+            try {
+                const response = await fetch('/Admin/UpdateEndTime', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify({
+                        auctionId: auctionId,
+                        newEndTime: newEndTime
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('End time updated successfully!');
+                    closeModal();
+                    loadLiveAuctions();
+                } else {
+                    alert(result.message);
+                }
+            } catch (error) {
+                alert('Error updating time');
             }
         }
 

@@ -248,4 +248,58 @@ public class AdminController : Controller
             });
         }
     }
+
+    [HttpGet]
+    public async Task<IActionResult> GetLiveAuctions()
+    {
+        try
+        {
+            var activeAuctions = await _auctionRepo.GetAllActiveAuctions();
+
+            var liveAuctions = activeAuctions.Where(a => a.EndTime > DateTime.Now)
+                .Select(a => new
+                {
+                    AuctionId = a.Id,
+                    ProductName = a.Item?.Name ?? "Unknown",
+                    Category = a.Item?.Category ?? "Uncategorized",
+                    StartingPrice = a.StartingPrice,
+                    CurrentPrice = a.CurrentPrice,
+                    EndTime = a.EndTime
+                }).ToList();
+
+            return Json(liveAuctions);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            return Json(new List<object>());
+        }
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> UpdateEndTime([FromBody] SimpleTimeUpdate request)
+    {
+        try
+        {
+            var auction = await _auctionRepo.GetAuctionById(request.AuctionId);
+
+            if (auction == null)
+                return Json(new { success = false, message = "Auction not found" });
+
+            auction.EndTime = DateTime.Parse(request.NewEndTime);
+            await _auctionRepo.UpdateAuction(auction);
+
+            return Json(new { success = true, message = "End time updated" });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = "Error: " + ex.Message });
+        }
+    }
+
+    public class SimpleTimeUpdate
+    {
+        public int AuctionId { get; set; }
+        public string NewEndTime { get; set; }
+    }
 }
