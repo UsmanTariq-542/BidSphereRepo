@@ -1,0 +1,57 @@
+﻿@using BidSphereProject.ViewModels
+@model IEnumerable<CategoryLinkViewModel>
+@{
+    bool showTitle = ViewBag.ShowCategoryTitle ?? true;
+}
+
+<div class="row mb-4">
+    <div class="col">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                @if (showTitle)
+                {
+                    <h5 class="card-title mb-4">
+                        <i class="fas fa-th-large me-2 text-primary"></i>
+                        Browse by Category
+                    </h5>
+                }
+
+                <!-- Bootstrap Grid - 6 columns on desktop, 3 on tablet, 2 on mobile -->
+                <div class="row g-3">
+                    @foreach (var category in Model)
+                    {
+                        <div class="col-6 col-md-4 col-lg-2">
+                            <a href="@Url.Action("IndividualCategory", "Auction", new { id = category.CategoryName })"
+                               class="category-card text-decoration-none">
+                                <div class="card border h-100 text-center hover-lift">
+                                    <div class="card-body p-3 d-flex flex-column justify-content-center">
+                                        <div class="@category.ColorClass mb-2">
+                                            <i class="@category.IconClass fa-2x"></i>
+                                        </div>
+                                        <h6 class="card-title mb-1">@category.DisplayName</h6>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-lift {
+        transition: all 0.25s ease;
+    }
+
+        .hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+            border-color: #0d6efd !important;
+        }
+
+    .category-card:hover .card-title {
+        color: #0d6efd;
+    }
+</style>

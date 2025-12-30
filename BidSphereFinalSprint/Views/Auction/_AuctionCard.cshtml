@@ -1,0 +1,79 @@
+﻿@model Auction
+
+<div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+    <div class="card h-100 shadow-sm border-0">
+        <div class="card-header bg-transparent border-bottom-0 pt-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="badge bg-success">Live</span>
+                <div>
+                    <span class="badge bg-secondary">@Model.Item.Category</span>
+                    <small class="text-muted ms-2">#@Model.Item.Id</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <!-- Product Image Placeholder with Category-based Icons -->
+            <div class="text-white rounded-3 text-center py-4 mb-3
+                @(Model.Item.Category == "Laptops" ? "bg-primary" :
+                                   Model.Item.Category == "Fashion Outfit" ? "bg-success" :
+                                   Model.Item.Category == "Home Appliances" ? "bg-info" :
+                                   Model.Item.Category == "Perfumes" ? "bg-warning" :
+                                   Model.Item.Category == "Luxury Watches" ? "bg-danger" : "bg-secondary")">
+                <i class="@(Model.Item.Category == "Laptops" ? "fas fa-laptop" :
+                                           Model.Item.Category == "Fashion Outfit" ? "fas fa-tshirt" :
+                                           Model.Item.Category == "Home Appliances" ? "fas fa-tv" :
+                                           Model.Item.Category == "Perfumes" ? "fas fa-spray-can" :
+                                           Model.Item.Category == "Luxury Watches" ? "fas fa-clock" : "fas fa-car") fa-3x"></i>
+            </div>
+
+            <h5 class="card-title">@Model.Item.Name</h5>
+            <p class="card-text text-muted small mb-3">
+                <i class="fas fa-tag me-1"></i>Category: @Model.Item.Category
+            </p>
+
+            <!-- Price Information -->
+            <div class="row g-2 mb-3">
+                <div class="col-6">
+                    <div class="border rounded p-2 text-center">
+                        <small class="text-muted d-block">Starting Price</small>
+                        <strong class="text-dark">$@Model.StartingPrice</strong>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="border rounded p-2 text-center bg-light">
+                        <small class="text-muted d-block">Current Bid</small>
+                        <strong class="text-primary fs-5">$@Model.CurrentPrice</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Countdown Timer -->
+            <div class="border rounded p-3 bg-light mb-3">
+                <small class="text-muted d-block mb-1">
+                    <i class="fas fa-clock me-1"></i>Ends in:
+                </small>
+                <div class="timer text-danger fw-bold fs-6" data-endtime="@Model.EndTime.ToString("yyyy-MM-ddTHH:mm:ss")">
+                    Loading...
+                </div>
+            </div>
+
+            <!-- Bidder Information -->
+            <div class="d-flex justify-content-between align-items-center text-muted small mb-3">
+                <span>
+                    <i class="fas fa-gavel me-1"></i>@Model.BidCount bids
+                </span>
+            </div>
+        </div>
+
+        <div class="card-footer bg-transparent border-top-0 pb-3">
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary btn-lg place-bid-btn"
+                        data-product-id="@Model.ProductId"
+                        data-current-price="@Model.CurrentPrice">
+                    <i class="fas fa-gavel me-2"></i>Place Bid
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

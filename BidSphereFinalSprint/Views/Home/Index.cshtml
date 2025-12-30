@@ -1,0 +1,27 @@
+﻿@{
+    <title>@(ViewData["Title"] ?? "BidSphere")</title>
+}
+
+<!-- Hero Section -->
+<section class="container-xxl position-relative text-center text-white min-vh-100 d-flex flex-column justify-content-center align-items-center"
+         style="background: url('/images/homePageBackground.png') no-repeat center center fixed; background-size: cover;">
+
+    <!-- Optional overlay for readability -->
+    <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-50"></div>
+
+    <div class="container d-flex flex-column justify-content-center align-items-center h-100 position-relative px-3">
+        <!-- App Name -->
+        <h1 class="display-3 fw-bold mb-3">BidSphere</h1>
+
+        <!-- Description -->
+        <p class="lead mb-4" style="max-width: 600px;">
+            Seamless online auctions — bid, track, and win in real-time with automated validation and countdown timers.
+        </p>
+
+        <!-- Buttons -->
+        <div class="d-flex gap-3 flex-wrap justify-content-center">
+            <a class="btn btn-outline-light btn-lg px-4 py-2 fw-semibold" asp-area="Identity" asp-page="/Account/Register">Register</a>
+            <a class="btn btn-outline-light btn-lg px-4 py-2 fw-semibold" asp-area="Identity" asp-page="/Account/Login">Login</a>
+        </div>
+    </div>
+</section>

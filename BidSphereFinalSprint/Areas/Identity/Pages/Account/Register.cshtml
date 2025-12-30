@@ -1,0 +1,61 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<div class="vh-100 d-flex justify-content-center align-items-center bg-light"
+    style="background: url('/images/homePageBackground.png') no-repeat center center fixed; background-size: cover;">
+    <div class="card shadow-lg p-4 bg-primary-subtle" style="width: 400px; border-radius: 20px;">
+        <h3 class="text-center mb-1 fw-bold">Create your account</h3>
+        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Email" class="form-control rounded-3" placeholder="name@example.com" />
+                <label asp-for="Input.Email">Email</label>
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Password" type="password" class="form-control rounded-3" placeholder="Password" />
+                <label asp-for="Input.Password">Password</label>
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-4">
+                <input asp-for="Input.ConfirmPassword" type="password" class="form-control rounded-3" placeholder="Confirm Password" />
+                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-danger w-100 py-2 rounded-3 fw-semibold">Continue</button>
+
+            <div class="d-flex align-items-center my-3">
+                <hr class="flex-grow-1">
+                <span class="mx-2 text-muted">OR</span>
+                <hr class="flex-grow-1">
+            </div>
+
+            <div class="text-center">
+                <a class="btn btn-outline-dark w-100 rounded-3 d-flex align-items-center justify-content-center gap-2 mb-2" href="/Identity/Account/Login">
+                  
+                <img src="~/images/google-logo.svg" width="24" height="24" alt="Google Logo">
+                Continue with Google
+                </a>
+            </div>
+
+        </form>
+        <div class="text-center ">
+            <span class="text-muted">Already have an account? </span>
+            <a href="/Identity/Account/Login" class="fw-semibold text-decoration-none">Login here</a>
+        </div>
+    </div>
+</div>
+
+
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

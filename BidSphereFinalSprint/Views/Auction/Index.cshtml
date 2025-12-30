@@ -1,0 +1,112 @@
+﻿<div id="carouselExampleIndicators" class="carousel slide">
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+    </div>
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <img src="/images/auction01New.jpg" class="d-block w-100" alt="...">
+        </div>
+        <div class="carousel-item">
+            <img src="/images/auction02New.jpg" class="d-block w-100" alt="Auction02pic">
+        </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+<br />
+<div class="container">
+    <div class="row justify-content-evenly gy-3">
+        <h2 class="text-decoration-underline text-center mb-4">Auction Categories</h2>
+        <!-- First card -->
+
+        <div class="col-sm-12 col-md-6 col-xl-4 mb-4 text-center">
+            <div class="card product-card" style="width: 18rem;">
+                <img src="/images/perfume.jfif" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">Perfumes</h5>
+                    <p class="card-text">Luxury perfumes for every personality — bid, win, and wear confidence.</p>
+                </div>
+                <div class="card-footer">
+                    <a asp-controller="Auction" asp-action="IndividualCategory" asp-route-id="Perfumes" class="btn btn-danger">Explore Perfumes</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Second card -->
+        <div class="col-sm-12 col-md-6 col-xl-4 mb-4 text-center">
+            <div class="card product-card" style="width: 18rem;">
+                <img src="/images/HomeAppliancesN.jpg" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">Home Appliances</h5>
+                    <p class="card-text">Upgrade your home with smart appliances — bid on essentials that combine style and functionality.</p>
+                </div>
+                <div class="card-footer">
+                    <a asp-controller="Auction" asp-action="IndividualCategory" asp-route-id="Home Appliances" class="btn btn-danger">Explore Appliances</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Third card-->
+        <div class="col-sm-12 col-md-6 col-xl-4 mb-4 text-center">
+            <div class="card product-card" style="width: 18rem;">
+                <img src="/images/car.jfif" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">Automobile</h5>
+                    <p class="card-text">Bid on classic cars, sleek bikes, and luxury rides — find your next drive here.</p>
+                </div>
+                <div class="card-footer">
+                    <a asp-controller="Auction" asp-action="IndividualCategory" asp-route-id="Automobiles" class="btn btn-danger">Explore Automobiles</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fourth card-->
+        <div class="col-sm-12 col-md-6 col-xl-4 mb-4 text-center">
+            <div class="card product-card" style="width: 18rem;">
+                <img src="/images/fashionOutfit.jfif" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">Fashion Outfit</h5>
+                    <p class="card-text">Style that stands out — discover outfits worth bidding for.</p>
+                </div>
+                <div class="card-footer">
+                    <a asp-controller="Auction" asp-action="IndividualCategory" asp-route-id="Fashion Outfit" class="btn btn-danger">Explore Outfit</a>
+                </div>
+            </div>
+        </div>
+        <!-- Fifth card -->
+        <div class="col-sm-12 col-md-6 col-xl-4 mb-4 text-center">
+            <div class="card product-card" style="width: 18rem;">
+                <img src="/images/laptop.jfif" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">Laptops</h5>
+                    <p class="card-text">Discover high-performance laptops for work, gaming, and creativity — bid for the one that fits your style.</p>
+                </div>
+                <div class="card-footer">
+                    <a asp-controller="Auction" asp-action="IndividualCategory" asp-route-id="Laptops" class="btn btn-danger">Explore Laptops</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sixth card-->
+        <div class="col-sm-12 col-md-6 col-xl-4 mb-4 text-center">
+            <div class="card product-card flex-fill" style="width: 18rem;">
+                <img src="/images/watches.jpg" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">Luxury Watches</h5>
+                    <p class="card-text">Bid on timeless elegance — discover your next luxury watch here.</p>
+                </div>
+                <div class="card-footer">
+                    <a asp-controller="Auction" asp-action="IndividualCategory" asp-route-id="Luxury Watches" class="btn btn-danger">Explore Watches</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
