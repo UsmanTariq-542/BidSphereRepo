@@ -72,15 +72,15 @@
                 transition: all 0.3s;
             }
 
-            .sidebar-menu li:hover {
-                background-color: rgba(255, 255, 255, 0.1);
-                cursor: pointer;
-            }
+                .sidebar-menu li:hover {
+                    background-color: rgba(255, 255, 255, 0.1);
+                    cursor: pointer;
+                }
 
-            .sidebar-menu li.active {
-                background-color: rgba(255, 255, 255, 0.2);
-                border-left: 4px solid white;
-            }
+                .sidebar-menu li.active {
+                    background-color: rgba(255, 255, 255, 0.2);
+                    border-left: 4px solid white;
+                }
 
             .sidebar-menu i {
                 margin-right: 10px;
@@ -96,11 +96,11 @@
                 align-items: center;
             }
 
-            .sidebar-menu li a i {
-                margin-right: 10px;
-                width: 20px;
-                text-align: center;
-            }
+                .sidebar-menu li a i {
+                    margin-right: 10px;
+                    width: 20px;
+                    text-align: center;
+                }
 
             /* Keep hover effect for all items */
             .sidebar-menu li:hover {
@@ -350,28 +350,202 @@
         }
 
         /* Dashboard.cshtml ke style section mein (~line 200 ke baad) */
-
-        /* Modal Styling */
+        /* Improved Modal Styling */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 1000;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @@keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @@keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
         }
 
         .modal-content {
             background: white;
-            padding: 25px;
-            border-radius: 10px;
+            border-radius: 16px;
             width: 90%;
-            max-width: 400px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            max-width: 480px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 24px 28px;
+            position: relative;
+        }
+
+            .modal-header h3 {
+                margin: 0;
+                font-size: 1.5rem;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+            .modal-close:hover {
+                background: rgba(255, 255, 255, 0.3);
+                transform: rotate(90deg);
+            }
+
+        .modal-body {
+            padding: 28px;
+        }
+
+        .product-info {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-left: 4px solid var(--primary);
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+            .product-info p {
+                margin: 0;
+                color: #1e40af;
+                font-weight: 500;
+            }
+
+        .form-section label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 12px;
+        }
+
+        .time-inputs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .time-input-group {
+            text-align: center;
+        }
+
+        .time-input {
+            width: 100%;
+            padding: 14px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.2s;
+            background: #f9fafb;
+        }
+
+            .time-input:focus {
+                outline: none;
+                border-color: var(--primary);
+                background: white;
+                box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+            }
+
+        .time-label {
+            font-size: 0.85rem;
+            color: #6b7280;
+            font-weight: 500;
+            margin-top: 8px;
+        }
+
+        .preview-section {
+            background: #f0fdf4;
+            border: 2px dashed #86efac;
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .preview-time {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--success);
+            font-family: 'Courier New', monospace;
+        }
+
+        .info-box {
+            background: #fef3c7;
+            border-left: 4px solid var(--warning);
+            padding: 12px 16px;
+            border-radius: 8px;
+            display: flex;
+            gap: 10px;
+        }
+
+            .info-box p {
+                margin: 0;
+                color: #92400e;
+                font-size: 0.9rem;
+            }
+
+        .modal-footer {
+            padding: 20px 28px;
+            background: #f9fafb;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            border-top: 1px solid #e5e7eb;
         }
 
         /* Text Colors */
@@ -402,49 +576,46 @@
                 margin-right: 0;
             }
 
-            .filter-btn.active {
-                background-color: var(--primary);
-                color: white;
-                border-color: var(--primary);
-            }
+        .filter-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
 
         /* Responsive Design */
         @@media (max-width: 768px) {
-            .sidebar
+            .sidebar {
+                width: 70px;
+                overflow: hidden;
+            }
 
-        {
-            width: 70px;
-            overflow: hidden;
-        }
+            .sidebar-header h2, .sidebar-menu span {
+                display: none;
+            }
 
-        .sidebar-header h2, .sidebar-menu span {
-            display: none;
-        }
+            .sidebar-menu li {
+                text-align: center;
+                padding: 15px 0;
+            }
 
-        .sidebar-menu li {
-            text-align: center;
-            padding: 15px 0;
-        }
+            .sidebar-menu i {
+                margin-right: 0;
+                font-size: 1.2rem;
+            }
 
-        .sidebar-menu i {
-            margin-right: 0;
-            font-size: 1.2rem;
-        }
+            .main-content {
+                margin-left: 70px;
+            }
 
-        .main-content {
-            margin-left: 70px;
-        }
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
 
-        .stats-container {
-            grid-template-columns: 1fr;
-        }
-
-        .filter-container {
-            flex-direction: column;
-            gap: 15px;
-            align-items: flex-start;
-        }
-
+            .filter-container {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -574,7 +745,6 @@
             </div>
         </div>
 
-        <!-- Line ~230 ke baad, "Create Auction Section" ke baad -->
         <!-- Create Auction Section -->
         <div id="create-auction" class="section">
             <!-- This will load the partial view -->
@@ -590,7 +760,6 @@
             </div>
         </div>
 
-        <!-- YEH NAYA SECTION ADD KAREIN -->
         <!-- Live Auctions Section -->
         <div id="live-auctions" class="section">
             <div class="table-container">
@@ -922,44 +1091,65 @@
             });
         }
 
-                function showEditModal(auctionId, productName) {
+        function showEditModal(auctionId, productName) {
             const modalHTML = `
                 <div class="modal-overlay" onclick="closeModal(event)">
                     <div class="modal-content" onclick="event.stopPropagation()">
-                        <h4>Set New End Time</h4>
-                        <p class="mb-2"><strong>Product:</strong> ${productName}</p>
+                        <div class="modal-header">
+                            <h3>
+                                <i class="fas fa-clock"></i>
+                                Set New End Time
+                            </h3>
+                            <button class="modal-close" onclick="closeModal(event)">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
 
-                        <div class="mb-3">
-                            <label><strong>Enter new end time:</strong></label>
-                            <div class="d-flex gap-2 mb-1">
-                                <div style="flex: 1;">
-                                    <input type="number" id="editDays" class="form-control"
-                                           placeholder="Days" min="0" value="1"
-                                           oninput="validatePositive(this)">
-                                    <div class="small text-center">Days</div>
-                                </div>
-                                <div style="flex: 1;">
-                                    <input type="number" id="editHours" class="form-control"
-                                           placeholder="Hours" min="0" max="23" value="0"
-                                           oninput="validatePositive(this)">
-                                    <div class="small text-center">Hours</div>
-                                </div>
-                                <div style="flex: 1;">
-                                    <input type="number" id="editMinutes" class="form-control"
-                                           placeholder="Minutes" min="0" max="59" value="0"
-                                           oninput="validatePositive(this)">
-                                    <div class="small text-center">Minutes</div>
+                        <div class="modal-body">
+                            <div class="product-info">
+                                <p><i class="fas fa-tag"></i> <strong>${productName}</strong></p>
+                            </div>
+
+                            <div class="form-section">
+                                <label>Enter duration to extend auction:</label>
+                                <div class="time-inputs">
+                                    <div class="time-input-group">
+                                        <input type="number" id="editDays" class="time-input"
+                                               min="0" value="1" oninput="validatePositive(this); updatePreview()">
+                                        <div class="time-label">DAYS</div>
+                                    </div>
+                                    <div class="time-input-group">
+                                        <input type="number" id="editHours" class="time-input"
+                                               min="0" max="23" value="0" oninput="validatePositive(this); updatePreview()">
+                                        <div class="time-label">HOURS</div>
+                                    </div>
+                                    <div class="time-input-group">
+                                        <input type="number" id="editMinutes" class="time-input"
+                                               min="0" max="59" value="0" oninput="validatePositive(this); updatePreview()">
+                                        <div class="time-label">MINUTES</div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="small text-muted">
-                                <i class="fas fa-info-circle"></i> Auction will end after this duration from now
+
+                            <div class="preview-section">
+                                <p style="margin: 0 0 8px 0; color: #166534; font-size: 0.9rem;">
+                                    <i class="fas fa-calendar-check"></i> New End Time
+                                </p>
+                                <div class="preview-time" id="previewTime">1d 0h 0m from now</div>
+                            </div>
+
+                            <div class="info-box">
+                                <i class="fas fa-info-circle"></i>
+                                <p>The auction will end after the specified duration from the current time.</p>
                             </div>
                         </div>
 
-                        <div class="d-flex justify-content-end gap-2">
-                            <button class="btn btn-secondary" onclick="closeModal(event)">Cancel</button>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" onclick="closeModal(event)">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
                             <button class="btn btn-primary" onclick="saveNewTime(${auctionId})">
-                                <i class="fas fa-check"></i> Set End Time
+                                <i class="fas fa-check"></i> Update Time
                             </button>
                         </div>
                     </div>
@@ -967,6 +1157,24 @@
             `;
 
             document.body.insertAdjacentHTML('beforeend', modalHTML);
+            updatePreview();
+        }
+
+        function updatePreview() {
+            const days = Math.max(0, parseInt(document.getElementById('editDays')?.value) || 0);
+            const hours = Math.max(0, Math.min(23, parseInt(document.getElementById('editHours')?.value) || 0));
+            const minutes = Math.max(0, Math.min(59, parseInt(document.getElementById('editMinutes')?.value) || 0));
+
+            const previewEl = document.getElementById('previewTime');
+            if (previewEl) {
+                if (days === 0 && hours === 0 && minutes === 0) {
+                    previewEl.textContent = 'Please enter a valid time';
+                    previewEl.style.color = '#ef4444';
+                } else {
+                    previewEl.textContent = `${days}d ${hours}h ${minutes}m from now`;
+                    previewEl.style.color = '#10b981';
+                }
+            }
         }
 
         // Validation function
@@ -977,8 +1185,12 @@
         }
 
         function closeModal(event) {
+            event?.stopPropagation();
             const modal = document.querySelector('.modal-overlay');
-            if (modal) modal.remove();
+            if (modal) {
+                modal.style.animation = 'fadeOut 0.2s ease-out';
+                setTimeout(() => modal.remove(), 200);
+            }
         }
 
         async function saveNewTime(auctionId) {
