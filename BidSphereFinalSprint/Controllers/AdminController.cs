@@ -5,20 +5,29 @@ using BidSphereProject.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 [Authorize(Policy = "AdminOnly")]
 public class AdminController : Controller
 {
     private readonly IAuctionRepository _auctionRepo;
-    private readonly UserManager<IdentityUser> _userManager;
-    private readonly AuctionService _auctionService; // For creating auctions
     private readonly IBidRepository _bidRepo;
-    public AdminController(IAuctionRepository auctionRepo,UserManager<IdentityUser> userManager,AuctionService auctionService,IBidRepository bidRepo)
+    private readonly UserManager<IdentityUser> _userManager;
+    private readonly AuctionService _auctionService;
+    private readonly ILogger<AdminController> _logger;
+
+    public AdminController(
+        IAuctionRepository auctionRepo,
+        IBidRepository bidRepo,
+        UserManager<IdentityUser> userManager,
+        AuctionService auctionService,
+        ILogger<AdminController> logger)
     {
         _auctionRepo = auctionRepo;
-        _bidRepo=bidRepo;
+        _bidRepo = bidRepo;
         _userManager = userManager;
         _auctionService = auctionService;
+        _logger = logger;
     }
 
     public async Task<IActionResult> Dashboard()
@@ -27,74 +36,69 @@ public class AdminController : Controller
 
         try
         {
-            // 1. Live Auctions Count - Using GetAllActiveAuctions()
-            var activeAuctions = await _auctionRepo.GetAuctionCount();
-            dashboardVM.LiveAuctionsCount = activeAuctions;
+            // Run independent queries in parallel
+            var auctionCountTask = _auctionRepo.GetAuctionCount();
+            var totalBidsTask = _bidRepo.GetTotalBidsCount();
+            var userCountTask = _userManager.Users.CountAsync();
+            var revenueTask = _auctionRepo.CalculateRevenue(0.02m);
 
-            // 2. Total Bids Count
-            dashboardVM.TotalBids = await _bidRepo.GetTotalBidsCount();
+            await Task.WhenAll(auctionCountTask, totalBidsTask, userCountTask, revenueTask);
 
-            // 3. Total Registered Users
-            dashboardVM.TotalRegisteredUsers = _userManager.Users.Count();
+            dashboardVM.LiveAuctionsCount = auctionCountTask.Result;
+            dashboardVM.TotalBids = totalBidsTask.Result;
+            dashboardVM.TotalRegisteredUsers = userCountTask.Result;
+            dashboardVM.RevenueGenerated = revenueTask.Result;
 
-            // 4. Revenue Generated (Completed auctions revenue)
-            dashboardVM.RevenueGenerated = await _auctionRepo.CalculateRevenue(0.02m);
+            dashboardVM.RecentBidActivities = new List<BidActivityVM>();
 
-            // 5. Recent Bid Activities 
-            dashboardVM.RecentBidActivities= new List<BidActivityVM>();
-            Console.WriteLine("5. Getting recent bids...");
-            IEnumerable<Bid> bids=await _bidRepo.GetLatestBids(5);
-            Console.WriteLine($"Found {bids?.Count() ?? 0} recent bids");
+            var bids = await _bidRepo.GetLatestBids(5);
+
             if (bids != null && bids.Any())
             {
-                foreach (Bid bid in bids)
+                // -------- Fix N+1 Auction Queries --------
+                var auctionIds = bids.Select(b => b.AuctionId).Distinct().ToList();
+
+                var auctions = new Dictionary<int, Auction>();
+
+                foreach (var id in auctionIds)
                 {
-                    Console.WriteLine($"Processing bid ID: {bid.Id}");
-                    bid.AuctionInfo = await _auctionRepo.GetAuctionById(bid.AuctionId);
+                    var auction = await _auctionRepo.GetAuctionById(id);
+                    if (auction != null)
+                        auctions[id] = auction;
+                }
+                // -----------------------------------------
 
-                    if (bid.AuctionInfo == null)
-                    {
-                        Console.WriteLine($"  ERROR: Auction not found for ID: {bid.AuctionId}");
+                foreach (var bid in bids)
+                {
+                    if (!auctions.ContainsKey(bid.AuctionId))
                         continue;
-                    }
 
-                    Console.WriteLine($"  Auction found. ProductId: {bid.AuctionInfo.ProductId}");
+                    var auction = auctions[bid.AuctionId];
 
-                    if (bid.AuctionInfo.Item == null)
-                    {
-                        Console.WriteLine($"  ERROR: Auction.Item is null");
+                    if (auction.Item == null)
                         continue;
-                    }
-
-                    Console.WriteLine($"  Getting user info for UserId: {bid.UserId}");
-
 
                     var user = await _userManager.FindByIdAsync(bid.UserId);
-                    string email = user?.Email?? "unknown";
-                    Console.WriteLine($"  User email: {email}");
-                    dashboardVM.RecentBidActivities.Add(
-                        new BidActivityVM
-                        {
-                            AuctionName = bid.AuctionInfo.Item.Name,
-                            BidderUsername = email,
-                            Action = "Bid Placed",
-                            BidAmount = bid.Amount,
-                            TimeAgo = GetTimeAgo(bid.BidTime)
-                        });
-                    Console.WriteLine($"  Bid activity added successfully");
+                    var email = user?.Email ?? "unknown";
+
+                    dashboardVM.RecentBidActivities.Add(new BidActivityVM
+                    {
+                        AuctionName = auction.Item.Name,
+                        BidderUsername = email,
+                        Action = "Bid Placed",
+                        BidAmount = bid.Amount,
+                        TimeAgo = GetTimeAgo(bid.BidTime)
+                    });
                 }
             }
             else
             {
-                Console.WriteLine("No recent bids found, using sample data");
                 dashboardVM.RecentBidActivities = GetSampleBidActivities();
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"EXCEPTION CAUGHT: {ex.Message}");
-            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-            // Fallback to temporary data
+            _logger.LogError(ex, "Error loading admin dashboard");
             dashboardVM = GetTemporaryDashboardData();
         }
 
@@ -103,8 +107,7 @@ public class AdminController : Controller
 
     private string GetTimeAgo(DateTime bidTime)
     {
-        var now = DateTime.Now;
-        var span = now - bidTime;
+        var span = DateTime.Now - bidTime;
 
         if (span.TotalSeconds < 60)
             return "just now";
@@ -124,9 +127,6 @@ public class AdminController : Controller
         return $"{(int)(span.TotalDays / 365)} year(s) ago";
     }
 
-
-
-    // Temporary data methods
     private DashboardViewModel GetTemporaryDashboardData()
     {
         return new DashboardViewModel
@@ -141,7 +141,8 @@ public class AdminController : Controller
 
     private List<BidActivityVM> GetSampleBidActivities()
     {
-        return new List<BidActivityVM>{
+        return new List<BidActivityVM>
+        {
             new BidActivityVM
             {
                 AuctionName = "MacBook Pro 2023",
@@ -153,7 +154,7 @@ public class AdminController : Controller
             new BidActivityVM
             {
                 AuctionName = "Rolex Submariner",
-                BidderUsername = "alex_wong@example.com",
+                BidderUsername = "alex@example.com",
                 Action = "Bid Placed",
                 BidAmount = 7200m,
                 TimeAgo = "5 minutes ago"
@@ -161,32 +162,14 @@ public class AdminController : Controller
             new BidActivityVM
             {
                 AuctionName = "iPhone 14 Pro",
-                BidderUsername = "mike_jones@example.com",
+                BidderUsername = "mike@example.com",
                 Action = "Bid Placed",
                 BidAmount = 950m,
                 TimeAgo = "15 minutes ago"
-            },
-            new BidActivityVM
-            {
-                AuctionName = "Designer Dress",
-                BidderUsername = "emma_roberts@example.com",
-                Action = "Bid Placed",
-                BidAmount = 220m,
-                TimeAgo = "25 minutes ago"
-            },
-            new BidActivityVM
-            {
-                AuctionName = "Refrigerator",
-                BidderUsername = "sarah_wilson@example.com",
-                Action = "Bid Placed",
-                BidAmount = 550m,
-                TimeAgo = "30 minutes ago"
             }
         };
     }
 
-
-    // Create Auction View
     public IActionResult CreateAuction()
     {
         return View(new CreateAuctionViewModel());
@@ -195,9 +178,7 @@ public class AdminController : Controller
     [HttpGet]
     public IActionResult CreateAuctionPartial()
     {
-        // Return partial view for dashboard
-        var model = new CreateAuctionViewModel();
-        return PartialView("_CreateAuctionPartial", model);
+        return PartialView("_CreateAuctionPartial", new CreateAuctionViewModel());
     }
 
     [HttpPost]
@@ -214,37 +195,31 @@ public class AdminController : Controller
             return Json(new
             {
                 success = false,
-                message = "Please fix the following errors:",
+                message = "Validation errors occurred",
                 errors = errors
             });
         }
 
         try
         {
-            int auctionId = await _auctionService.CreateAuction(model);
+            var auctionId = await _auctionService.CreateAuction(model);
 
             return Json(new
             {
                 success = true,
-                message = $"Auction created successfully! (ID: {auctionId})",
+                message = "Auction created successfully",
                 auctionId = auctionId,
                 redirectUrl = Url.Action("Dashboard", "Admin")
             });
         }
-        catch (ArgumentException ex)
-        {
-            return Json(new
-            {
-                success = false,
-                message = ex.Message
-            });
-        }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Error creating auction");
+
             return Json(new
             {
                 success = false,
-                message = $"An error occurred while creating the auction. Please try again later, {ex.Message}"
+                message = "An error occurred while creating the auction"
             });
         }
     }
@@ -256,7 +231,8 @@ public class AdminController : Controller
         {
             var activeAuctions = await _auctionRepo.GetAllActiveAuctions();
 
-            var liveAuctions = activeAuctions.Where(a => a.EndTime > DateTime.Now)
+            var liveAuctions = activeAuctions
+                .Where(a => a.EndTime > DateTime.Now)
                 .Select(a => new
                 {
                     AuctionId = a.Id,
@@ -271,7 +247,7 @@ public class AdminController : Controller
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error: {ex.Message}");
+            _logger.LogError(ex, "Error fetching live auctions");
             return Json(new List<object>());
         }
     }
@@ -293,7 +269,13 @@ public class AdminController : Controller
         }
         catch (Exception ex)
         {
-            return Json(new { success = false, message = "Error: " + ex.Message });
+            _logger.LogError(ex, "Error updating end time");
+
+            return Json(new
+            {
+                success = false,
+                message = "Failed to update auction end time"
+            });
         }
     }
 

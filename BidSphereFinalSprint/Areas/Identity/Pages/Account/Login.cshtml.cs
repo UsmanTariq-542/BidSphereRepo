@@ -118,22 +118,15 @@ namespace BidSphereProject.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     var user = await _userManager.FindByEmailAsync(Input.Email);
+                    var claims = await _userManager.GetClaimsAsync(user);
 
-                    // ✅ Dynamically add admin claim if email matches and claim does not exist
-                    if (string.Equals(user.Email, "adminBidSphere@gmail.com", StringComparison.OrdinalIgnoreCase))
+                    if (claims.Any(c => c.Type == "IsAdmin" && c.Value == "true"))
                     {
-                        var claims = await _userManager.GetClaimsAsync(user);
-                        if (!claims.Any(c => c.Type == "IsAdmin"))
-                        {
-                            await _userManager.AddClaimAsync(user, new Claim("IsAdmin", "true"));
-                        }
-
-                        // Redirect admin to dashboard
                         return LocalRedirect("/Admin/Dashboard");
                     }
                     else
                     {
-                        return LocalRedirect("/Auction/Index"); // Normal user page
+                        return LocalRedirect("/Auction/Index");
                     }
                 }
                 if (result.RequiresTwoFactor)
