@@ -72,15 +72,15 @@
                 transition: all 0.3s;
             }
 
-                .sidebar-menu li:hover {
-                    background-color: rgba(255, 255, 255, 0.1);
-                    cursor: pointer;
-                }
+            .sidebar-menu li:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+                cursor: pointer;
+            }
 
-                .sidebar-menu li.active {
-                    background-color: rgba(255, 255, 255, 0.2);
-                    border-left: 4px solid white;
-                }
+            .sidebar-menu li.active {
+                background-color: rgba(255, 255, 255, 0.2);
+                border-left: 4px solid white;
+            }
 
             .sidebar-menu i {
                 margin-right: 10px;
@@ -96,11 +96,11 @@
                 align-items: center;
             }
 
-                .sidebar-menu li a i {
-                    margin-right: 10px;
-                    width: 20px;
-                    text-align: center;
-                }
+            .sidebar-menu li a i {
+                margin-right: 10px;
+                width: 20px;
+                text-align: center;
+            }
 
             /* Keep hover effect for all items */
             .sidebar-menu li:hover {
@@ -367,35 +367,44 @@
         }
 
         @@keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
+            from
 
-            to {
-                opacity: 1;
-            }
+        {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+
         }
 
         @@keyframes slideUp {
-            from {
-                transform: translateY(30px);
-                opacity: 0;
-            }
+            from
 
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+        {
+            transform: translateY(30px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
         }
 
         @@keyframes fadeOut {
-            from {
-                opacity: 1;
-            }
+            from
 
-            to {
-                opacity: 0;
-            }
+        {
+            opacity: 1;
+        }
+
+        to {
+            opacity: 0;
+        }
+
         }
 
         .modal-content {
@@ -547,7 +556,7 @@
             justify-content: flex-end;
             border-top: 1px solid #e5e7eb;
         }
-
+        
         /* Text Colors */
         .text-success {
             color: #28a745 !important;
@@ -576,46 +585,49 @@
                 margin-right: 0;
             }
 
-        .filter-btn.active {
-            background-color: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
+            .filter-btn.active {
+                background-color: var(--primary);
+                color: white;
+                border-color: var(--primary);
+            }
 
         /* Responsive Design */
         @@media (max-width: 768px) {
-            .sidebar {
-                width: 70px;
-                overflow: hidden;
-            }
+            .sidebar
 
-            .sidebar-header h2, .sidebar-menu span {
-                display: none;
-            }
+        {
+            width: 70px;
+            overflow: hidden;
+        }
 
-            .sidebar-menu li {
-                text-align: center;
-                padding: 15px 0;
-            }
+        .sidebar-header h2, .sidebar-menu span {
+            display: none;
+        }
 
-            .sidebar-menu i {
-                margin-right: 0;
-                font-size: 1.2rem;
-            }
+        .sidebar-menu li {
+            text-align: center;
+            padding: 15px 0;
+        }
 
-            .main-content {
-                margin-left: 70px;
-            }
+        .sidebar-menu i {
+            margin-right: 0;
+            font-size: 1.2rem;
+        }
 
-            .stats-container {
-                grid-template-columns: 1fr;
-            }
+        .main-content {
+            margin-left: 70px;
+        }
 
-            .filter-container {
-                flex-direction: column;
-                gap: 15px;
-                align-items: flex-start;
-            }
+        .stats-container {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-container {
+            flex-direction: column;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">

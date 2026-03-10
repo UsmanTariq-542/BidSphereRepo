@@ -2,6 +2,7 @@
 using BidSphereProject.Models;
 using Dapper;
 using Microsoft.Data.SqlClient;
+using System.Linq;
 namespace BidSphereProject.Repositories
 {
     public class AuctionRepository: IAuctionRepository
@@ -36,7 +37,17 @@ namespace BidSphereProject.Repositories
             {
                 string sqlcmd = "Select * from Auction where Id=@Id";
                 Auction auction = await con.QuerySingleOrDefaultAsync<Auction>(sqlcmd, new { Id = id });
-                auction.Item = await _productRepo.GetProductById(auction.Id);
+                if (auction != null)
+                {
+                    auction.Item = await _productRepo.GetProductById(auction.ProductId);
+
+                    // Ensure BidCount reflects actual number of bids (in case it's out of sync)
+                    var countSql = "SELECT COUNT(*) FROM Bid WHERE AuctionId = @Id";
+                    auction.BidCount = await con.ExecuteScalarAsync<int>(countSql, new { Id = auction.Id });
+
+                    // Optionally load bids into auction.Bids if needed (commented out for performance)
+                    // auction.Bids = (await con.QueryAsync<Bid>("SELECT * FROM Bid WHERE AuctionId=@Id ORDER BY BidTime DESC", new { Id = auction.Id })).ToList();
+                }
                 return auction;
             }
         }
@@ -54,7 +65,22 @@ namespace BidSphereProject.Repositories
             using(SqlConnection con=new SqlConnection(_connectionString))
             {
                 string sqlcmd = "Select * from Auction";
-                IEnumerable<Auction> auctions=await con.QueryAsync<Auction>(sqlcmd);
+                var auctions = (await con.QueryAsync<Auction>(sqlcmd)).ToList();
+
+                if (auctions.Any())
+                {
+                    // populate up-to-date bid counts in a single query
+                    var ids = auctions.Select(a => a.Id).ToArray();
+                    var countsSql = "SELECT AuctionId, COUNT(*) AS Cnt FROM Bid WHERE AuctionId IN @Ids GROUP BY AuctionId";
+                    var rows = await con.QueryAsync(countsSql, new { Ids = ids });
+                    var dict = rows.ToDictionary(r => (int)r.AuctionId, r => (int)r.Cnt);
+
+                    foreach (var a in auctions)
+                    {
+                        a.BidCount = dict.TryGetValue(a.Id, out var c) ? c : 0;
+                    }
+                }
+
                 return auctions;
             }
         }
@@ -96,15 +122,30 @@ namespace BidSphereProject.Repositories
                       AND a.EndTime > GETDATE()
                     ORDER BY a.StartTime DESC;";
 
-                return await con.QueryAsync<Auction, Product, Auction>(   // obj1,obj2,returntype
+                var auctions = (await con.QueryAsync<Auction, Product, Auction>(
                     sql,
                     (auction, product) =>
                     {
-                        auction.Item = product;   // same Product obj item which we created for referencing 
+                        auction.Item = product;   // attach product
                         return auction;
                     },
                     new { Category = category }
-                );
+                )).ToList();
+
+                if (auctions.Any())
+                {
+                    var ids = auctions.Select(a => a.Id).ToArray();
+                    var countsSql = "SELECT AuctionId, COUNT(*) AS Cnt FROM Bid WHERE AuctionId IN @Ids GROUP BY AuctionId";
+                    var rows = await con.QueryAsync(countsSql, new { Ids = ids });
+                    var dict = rows.ToDictionary(r => (int)r.AuctionId, r => (int)r.Cnt);
+
+                    foreach (var a in auctions)
+                    {
+                        a.BidCount = dict.TryGetValue(a.Id, out var c) ? c : 0;
+                    }
+                }
+
+                return auctions;
             }
         }
 
@@ -120,7 +161,7 @@ namespace BidSphereProject.Repositories
                                   AND a.EndTime > GETDATE()
                                 ORDER BY a.StartTime DESC";
 
-                var auctions = await con.QueryAsync<Auction, Product, Auction>(
+                var auctions = (await con.QueryAsync<Auction, Product, Auction>(
                     sql,
                     (auction, product) =>
                     {
@@ -128,7 +169,20 @@ namespace BidSphereProject.Repositories
                         return auction;
                     },
                     splitOn: "Id"  // Dapper needs this
-                );
+                )).ToList();
+
+                if (auctions.Any())
+                {
+                    var ids = auctions.Select(a => a.Id).ToArray();
+                    var countsSql = "SELECT AuctionId, COUNT(*) AS Cnt FROM Bid WHERE AuctionId IN @Ids GROUP BY AuctionId";
+                    var rows = await con.QueryAsync(countsSql, new { Ids = ids });
+                    var dict = rows.ToDictionary(r => (int)r.AuctionId, r => (int)r.Cnt);
+
+                    foreach (var a in auctions)
+                    {
+                        a.BidCount = dict.TryGetValue(a.Id, out var c) ? c : 0;
+                    }
+                }
 
                 return auctions;
             }
@@ -172,11 +226,12 @@ namespace BidSphereProject.Repositories
         {
             try
             {
-                var sql = "UPDATE Auction SET BidCount = BidCount + 1 , CurrentPrice=bidamount WHERE Id = @AuctionId";
+                // Fixed SQL: previous code set CurrentPrice=bidamount (literal) and didn't pass BidAmount param.
+                var sql = "UPDATE Auction SET BidCount = ISNULL(BidCount,0) + 1, CurrentPrice = @BidAmount WHERE Id = @AuctionId";
 
                 using (SqlConnection con = new SqlConnection(_connectionString))
                 {
-                    var rowsAffected = await con.ExecuteAsync(sql,new { AuctionId = auctionId });
+                    var rowsAffected = await con.ExecuteAsync(sql, new { AuctionId = auctionId, BidAmount = bidamount });
 
                     return rowsAffected > 0;
                 }

@@ -19,12 +19,14 @@
                                    Model.Item.Category == "Fashion Outfit" ? "bg-success" :
                                    Model.Item.Category == "Home Appliances" ? "bg-info" :
                                    Model.Item.Category == "Perfumes" ? "bg-warning" :
-                                   Model.Item.Category == "Luxury Watches" ? "bg-danger" : "bg-secondary")">
+                                   Model.Item.Category == "Luxury Watches" ? "bg-danger" :
+                                   Model.Item.Category == "Automobiles" ? "bg-secondary" : "bg-secondary")">
                 <i class="@(Model.Item.Category == "Laptops" ? "fas fa-laptop" :
                                            Model.Item.Category == "Fashion Outfit" ? "fas fa-tshirt" :
                                            Model.Item.Category == "Home Appliances" ? "fas fa-tv" :
                                            Model.Item.Category == "Perfumes" ? "fas fa-spray-can" :
-                                           Model.Item.Category == "Luxury Watches" ? "fas fa-clock" : "fas fa-car") fa-3x"></i>
+                                           Model.Item.Category == "Luxury Watches" ? "fas fa-clock" :
+                                           Model.Item.Category == "Automobiles" ? "fas fa-car" : "fas fa-box") fa-3x"></i>
             </div>
 
             <h5 class="card-title">@Model.Item.Name</h5>

@@ -28,7 +28,7 @@ namespace BidSphereProject.Controllers
         private readonly List<string> _validCategories = new List<string>
         {
             "Fashion Outfit", "Home Appliances", "Laptops",
-            "Perfumes", "Luxury Watches", "Automobile"
+            "Perfumes", "Luxury Watches", "Automobiles", "Others"
         };
 
         public IActionResult Index()
