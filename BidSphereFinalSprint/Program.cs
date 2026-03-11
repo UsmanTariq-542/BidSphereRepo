@@ -34,7 +34,14 @@ namespace BidSphereProject
                 {
                     googleOptions.ClientId = "329991947819-h9av0jc720jvac6s92ic2aouddprtpvs.apps.googleusercontent.com";
                     googleOptions.ClientSecret = "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";
+                    googleOptions.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always; // yeh add karo
+                    googleOptions.CorrelationCookie.SameSite = SameSiteMode.Lax; // yeh add karo
                 });
+
+            builder.Services.ConfigureApplicationCookie(options => {
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.SameSite = SameSiteMode.Lax;
+            });
 
             // Dependency injection 
             builder.Services.AddScoped<IProductRepository, ProductRepository>();
@@ -51,11 +58,6 @@ namespace BidSphereProject
                 options.AddPolicy("AdminOnly", policy => 
                 policy.RequireClaim("IsAdmin", "true"));   // for protecting admin page and functionalities.
             
-
-                options.AddPolicy("ContactOpen", policy =>
-                    policy.RequireAssertion(context =>
-                        DateTime.Now.Hour >= 9 && DateTime.Now.Hour <= 18      // like in just business hours only website accessed
-                ));
             });
 
             var app = builder.Build();
@@ -67,7 +69,7 @@ namespace BidSphereProject
                 db.Database.EnsureCreated(); // <- here
             }
 
-            // Configure the HTTP request pipeline.
+            // removed for testing purposes, should be added in production
             if (app.Environment.IsDevelopment())
             {
                 app.UseMigrationsEndPoint();
@@ -75,7 +77,12 @@ namespace BidSphereProject
             else
             {
                 app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
             }
+
+            app.UseHttpsRedirection();
+
+
             app.UseRouting();
 
             app.UseAuthentication();

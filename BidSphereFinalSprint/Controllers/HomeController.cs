@@ -22,7 +22,6 @@ namespace BidSphereProject.Controllers
             return View();
         }
 
-        [Authorize(Policy = "ContactOpen")]
         public IActionResult Contact()
         {
             return View();
