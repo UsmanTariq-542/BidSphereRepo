@@ -11,10 +11,12 @@ namespace BidSphereProject.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IConfiguration _configuration;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IConfiguration configuration)
         {
             _logger = logger;
+            _configuration = configuration;
         }
 
         public IActionResult Index()
@@ -50,7 +52,13 @@ namespace BidSphereProject.Controllers
                     $"Message: {model.Message}";
 
                 SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
-                smtp.Credentials = new NetworkCredential("bidsphereproject@gmail.com", "bixw mvug vzzx ammc");
+                
+                // fetched from secrets.json 
+                var smtpUser = _configuration["EmailSettings:SmtpUser"];
+                var smtpPassword = _configuration["EmailSettings:SmtpPassword"];
+                smtp.Credentials = new NetworkCredential(smtpUser, smtpPassword);
+
+
                 smtp.EnableSsl = true;
                 smtp.Send(mail);
 

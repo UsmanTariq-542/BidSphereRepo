@@ -32,10 +32,10 @@ namespace BidSphereProject
             builder.Services.AddAuthentication()
                 .AddGoogle(googleOptions =>
                 {
-                    googleOptions.ClientId = "329991947819-h9av0jc720jvac6s92ic2aouddprtpvs.apps.googleusercontent.com";
-                    googleOptions.ClientSecret = "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";
-                    googleOptions.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always; // yeh add karo
-                    googleOptions.CorrelationCookie.SameSite = SameSiteMode.Lax; // yeh add karo
+                    googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+                    googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+                    googleOptions.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always; 
+                    googleOptions.CorrelationCookie.SameSite = SameSiteMode.Lax; 
                 });
 
             builder.Services.ConfigureApplicationCookie(options => {
